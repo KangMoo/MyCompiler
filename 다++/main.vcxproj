@@ -23,6 +23,7 @@
     <ProjectGuid>{CB5F8504-B681-4742-837E-2A945BDAC5E7}</ProjectGuid>
     <RootNamespace>main</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+    <ProjectName>다++</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -122,6 +123,7 @@
     <ClCompile Include="lexer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="parser.cpp" />
+    <ClCompile Include="TypeCheckr.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AST.h" />
@@ -129,6 +131,7 @@
     <ClInclude Include="parser.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TokenType.h" />
+    <ClInclude Include="TypeCheckr.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="test.txt" />

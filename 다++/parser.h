@@ -22,12 +22,39 @@ public:
 class Variable : public Expression {
 public:
 	string id;
+	TokenType type;
+	bool undef = true;
+	int intValue;
+	float floatValue;
+	bool boolValue;
+	char charValue;
 public:
-	Variable(string str) { id = str; StatementName = "Variable";};
 	Variable() {};
-	string getString() {
-		return id;
-	};
+	Variable(Token t) {
+		type = t.TokenType;
+		id = t.TokenName;
+		if (type == IntLiteral)
+		{
+			intValue = stoi(t.TokenValue);
+		}
+		else if (type == FloatLiteral)
+		{
+			floatValue = stof(t.TokenValue);
+		}
+		else if (type == CharLiteral)
+		{
+			charValue = t.TokenValue[0];
+		}
+		else if (type == True)
+		{
+			boolValue = true;
+		}
+		else if (type == False)
+		{
+			boolValue = false;
+		}
+		StatementName = "Variable";
+	}
 };
 class Value : public Expression {
 public:

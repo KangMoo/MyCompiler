@@ -104,9 +104,8 @@ Statement * parser::statementf()
 
 Assignment* parser::assignment()
 {
-	string str = _token.TokenName;
+	Variable* var = new Variable(_token);
 	match((TokenType)Identifier);
-	Variable* var = new Variable(str);
 	match((TokenType)Assign);
 	Expression* source = expression();
 	match((TokenType)Semicolon);
@@ -263,9 +262,8 @@ Expression* parser::primary()
 	Expression *e = NULL;
 	if (_token.TokenType == (TokenType)Identifier)
 	{
-		string temp = _token.TokenName;
-		match((TokenType)Identifier);
-		e = new Variable(temp);
+		e = new Variable(_token);
+		match(_token.TokenType);
 	}
 	else if (_token.TokenType == IntLiteral || _token.TokenType == CharLiteral || _token.TokenType == FloatLiteral || _token.TokenType == True || _token.TokenType == False)
 	{

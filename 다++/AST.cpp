@@ -80,7 +80,7 @@ void AST::displayExpression(Expression * e)
 void AST::displayAssignment(Assignment * a, int tab)
 {
 	tabSet(tab); cout << "<Assignment>" << endl;;
-	tabSet(tab+1); cout << "Target :" << a->target->getString() << endl;
+	tabSet(tab+1); cout << "Target :" << a->target->id << endl;
 	tabSet(tab + 1); cout << "Source :";
 	displayExpression(a->source);
 	cout << endl;
