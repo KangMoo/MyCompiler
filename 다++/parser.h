@@ -116,7 +116,8 @@ public:
 class Block : public Statement {
 public:
 	vector<Statement*> members;
-	Block() { StatementName = "Block"; };
+	bool isThereBrace = false;
+	Block(bool brace) { StatementName = "Block"; isThereBrace = brace; };
 };
 
 class Skip : public Statement {
@@ -155,6 +156,7 @@ class Declaration : public Statement {
 public:
 	TokenType valueType;
 	vector<string> valueName;
+	vector<Assignment*> assign;
 	Declaration() { StatementName = "Declaration"; };
 };
 
@@ -166,6 +168,7 @@ private:
 	vector<Token> _vToken;
 	int _nowTokenNum;
 	Token _token;
+
 	Block *_block;
 
 
@@ -176,7 +179,7 @@ private:
 	Statement* Skip();
 	Conditional* Ifstatement();
 	Loop* WhileStatement();
-	Declaration* declaration();
+	Block* declaration();
 	//
 	Expression* expression();
 	Expression* conjunction();
@@ -187,6 +190,7 @@ private:
 	Expression* factor();
 	Expression* primary();
 	//
+
 public:
 	void init();
 	void parse();

@@ -23,3 +23,5 @@ Debug/다++.exe
 다++/Debug/vc141.idb
 다++/Debug/parser.obj
 다++/Debug/lexer.obj
+.vs/다++/v15/ipch/AutoPCH/a0255db5c8f2cc61/LEXER.ipch
+다++/Debug/lexer.obj.enc

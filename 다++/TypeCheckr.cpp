@@ -49,7 +49,10 @@ void TypeCheckr::typeCheck(Statement * s, const int tsp)
 		{
 			typeCheck(i, nowTypeMapSP);
 		}
-		_typeMap.erase(_typeMap.begin() + nowTypeMapSP+1, _typeMap.end());
+		if (b->isThereBrace)
+		{
+			_typeMap.erase(_typeMap.begin() + nowTypeMapSP + 1, _typeMap.end());
+		}
 	}
 	else if (s->StatementName == "Expression")
 	{

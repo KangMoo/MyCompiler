@@ -15,13 +15,21 @@ void AST::display()
 
 void AST::displayBlock(Block * b, int tab)
 {
-	tabSet(tab); cout << "<Block>" << endl;
-	tabSet(tab++); cout << "{" << endl;
+	if (b->isThereBrace)
+	{
+		tabSet(tab); cout << "<Block>" << endl;
+		tabSet(tab++); cout << "{" << endl;
+		
+	}
 	for (int i = 0; i < b->members.size(); i++)
 	{
 		displayStatement(b->members[i], tab);
 	}
-	tabSet(--tab); cout << "}" << endl;
+	if (b->isThereBrace)
+	{
+		tabSet(--tab); cout << "}" << endl;
+	}
+	
 }
 
 void AST::displayStatement(Statement * s, int tab)
@@ -80,7 +88,7 @@ void AST::displayExpression(Expression * e)
 void AST::displayAssignment(Assignment * a, int tab)
 {
 	tabSet(tab); cout << "<Assignment>" << endl;;
-	tabSet(tab+1); cout << "Target :" << a->target->id << endl;
+	tabSet(tab + 1); cout << "Target :" << a->target->id << endl;
 	tabSet(tab + 1); cout << "Source :";
 	displayExpression(a->source);
 	cout << endl;
@@ -133,10 +141,9 @@ void AST::displayDeclaration(Declaration* d, int tab)
 	}
 	cout << endl;
 
-	tabSet(tab + 1); cout << "Name : ";
 	for (auto i : d->valueName)
 	{
-		cout << i << " " << endl;;
+		tabSet(tab + 1); cout << "Name : " << i << endl;
 	}
 }
 
@@ -196,7 +203,7 @@ void AST::tabSet(int c)
 
 AST::AST()
 {
-	_block = new Block();
+	_block = new Block(false);
 }
 
 

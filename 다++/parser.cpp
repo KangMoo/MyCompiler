@@ -40,6 +40,7 @@ void parser::parse()
 	match((TokenType)LeftBrace);
 	//
 	_block = Statements();
+	_block->isThereBrace = true;
 	//
 	match((TokenType)RightBrace);
 }
@@ -51,9 +52,8 @@ Block* parser::Statements()
 	{
 		match((TokenType)LeftBrace);
 		isThereLeftBrace = true;
-	}
-
-	Block *b = new Block();
+	} 
+	Block *b = new Block(isThereLeftBrace);
 	while (isStatement())
 	{
 		Statement* s = new Statement();
@@ -70,7 +70,7 @@ Block* parser::Statements()
 Statement * parser::statementf()
 {
 	Statement *temp = new Statement();
-	if (_token.TokenType == (TokenType)Int|| _token.TokenType == (TokenType)Char || _token.TokenType == (TokenType)Float || _token.TokenType == (TokenType)Bool)
+	if (_token.TokenType == (TokenType)Int || _token.TokenType == (TokenType)Char || _token.TokenType == (TokenType)Float || _token.TokenType == (TokenType)Bool)
 	{
 		temp = declaration();
 	}
@@ -142,31 +142,75 @@ Loop* parser::WhileStatement()
 	return new Loop(ex, statementf());
 }
 
-Declaration* parser::declaration()
+Block* parser::declaration()
 {
-	Declaration* temp = new Declaration();
-	temp->valueType = match(_token.TokenType);
+	Block* b = new Block(false);
+	Block* b2 = new Block(false);
+	Declaration* d = new Declaration();
+	Assignment* a = new Assignment();
+	d->valueType = match(_token.TokenType);
+	// 선언 ~
 	if (_token.TokenType == (TokenType)Identifier)
 	{
-		temp->valueName.push_back(_token.TokenName);
+		d->valueName.push_back(_token.TokenName);
+		Variable* vartemp = new Variable(_token);
 		match(_token.TokenType);
+
+		// 선언 및 정의 ~
+		if (_token.TokenType == (TokenType)Assign)
+		{
+			match(_token.TokenType);
+			if (_token.TokenType == (TokenType)IntLiteral ||
+				_token.TokenType == (TokenType)FloatLiteral ||
+				_token.TokenType == (TokenType)CharLiteral)
+			{
+				Value* valtemp = new Value(_token);
+				match(_token.TokenType);
+				a = new Assignment(vartemp,valtemp);
+				b2->members.push_back(a);
+			}
+		}
+		// ~ 선언 및 정의
+
+		// 다중선언 ~
 		while (_token.TokenType == (TokenType)Comma)
 		{
 			match(_token.TokenType);
+			// 선언 ~
 			if (_token.TokenType == (TokenType)Identifier)
 			{
-				temp->valueName.push_back(_token.TokenName);
+				d->valueName.push_back(_token.TokenName);
+				Variable* vartemp = new Variable(_token);
 				match(_token.TokenType);
+				// 선언 및 정의 ~
+				if (_token.TokenType == (TokenType)Assign)
+				{
+					match(_token.TokenType);
+					if (_token.TokenType == (TokenType)IntLiteral ||
+						_token.TokenType == (TokenType)FloatLiteral ||
+						_token.TokenType == (TokenType)CharLiteral)
+					{
+						Value* valtemp = new Value(_token);
+						match(_token.TokenType);
+						a = new Assignment(vartemp, valtemp);
+						b2->members.push_back(a);
+					}
+				}
+				// ~ 선언 및 정의
 			}
+			// ~ 선언
 		}
+		// ~ 다중선언
 		match((TokenType)Semicolon);
 	}
+	// ~ 선언
 	else
 	{
 		assert(false && "Declaration Error");
 	}
-	
-	return temp;
+	b->members.push_back(d);
+	b->members.push_back(b2);
+	return b;
 }
 
 Expression * parser::expression()

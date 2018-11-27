@@ -380,6 +380,7 @@ void lexer::tokenize(const string str, vector<Token> &vtoken)
 		vtoken.push_back(temptoken);
 	}
 
+	//잘못된 문자 검출
 	for (auto i : vtoken)
 	{
 		if (i.TokenType == Identifier)
@@ -393,6 +394,7 @@ void lexer::tokenize(const string str, vector<Token> &vtoken)
 	}
 
 
+	//실수
 	for (int i = 0; i < vtoken.size(); i++)
 	{
 		if (vtoken[i].TokenType == Period)
@@ -411,10 +413,51 @@ void lexer::tokenize(const string str, vector<Token> &vtoken)
 		}
 	}
 
-	temptoken.TokenName = "Eol";
-	temptoken.TokenValue = "Eol";
-	temptoken.TokenType = Eol;
-	vtoken.push_back(temptoken);
+	//선언&정의
+	//bool secondTry = false;
+	//for (int i = 0; i < vtoken.size(); i++)
+	//{
+	//	if (secondTry||
+	//		(vtoken[i].TokenType == (TokenType)Int ||
+	//		vtoken[i].TokenType == (TokenType)Char ||
+	//		vtoken[i].TokenType == (TokenType)Bool ||
+	//		vtoken[i].TokenType == (TokenType)Float))
+	//	{
+	//		if (vtoken[i + 1].TokenType == (TokenType)Identifier)
+	//		{
+	//			Token idtemp = vtoken[i + 1];
+	//			if (vtoken[i + 2].TokenType == (TokenType)Assign)
+	//			{
+	//				Token atemp = vtoken[i + 2];
+	//				if (vtoken[i + 3].TokenType == (TokenType)IntLiteral ||
+	//					vtoken[i + 3].TokenType == (TokenType)FloatLiteral ||
+	//					vtoken[i + 3].TokenType == (TokenType)CharLiteral)
+	//				{
+	//					Token literaltemp = vtoken[i + 3];
+	//					vtoken.erase(vtoken.begin() + i+2 , vtoken.begin() + i + 4);
+	//	
+	//					vtoken.push_back(idtemp);
+	//					vtoken.push_back(atemp);
+	//					vtoken.push_back(literaltemp);
+	//	
+	//					Token temptoken;
+	//					temptoken.TokenType = Semicolon;
+	//					temptoken.TokenName = ";";
+	//					temptoken.TokenValue = ";";
+	//					vtoken.push_back(temptoken);
+	//
+	//					i -= 0;
+	//					secondTry = true;
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
+
+	//temptoken.TokenName = "Eol";
+	//temptoken.TokenValue = "Eol";
+	//temptoken.TokenType = Eol;
+	//vtoken.push_back(temptoken);
 
 
 
