@@ -35,7 +35,7 @@ void lexer::tokenize(const string str, vector<Token> &vtoken)
 		if (str[i] == '+' || str[i] == '-' || str[i] == '*' || str[i] == '/' || str[i] == ',' || str[i] == '.' ||
 			str[i] == ';' || str[i] == '{' || str[i] == '}' || str[i] == '(' || str[i] == ')' || str[i] == '&' ||
 			str[i] == '|' || str[i] == '!' || str[i] == ' ' || str[i] == '\t' || str[i] == '\r' || str[i] == '?' || str[i] == '='
-			|| str[i] == '<' || str[i] == '>')
+			|| str[i] == '<' || str[i] == '>' || str[i] == '\'' || str[i] == '\"')
 		{
 			tkp.push_back(i);
 		}
@@ -85,8 +85,8 @@ void lexer::tokenize(const string str, vector<Token> &vtoken)
 	//연결찾기
 	for (int i = 0; i < tokstr.size() - 1; i++)
 	{
-		if ( (tokstr[i] == ">" || tokstr[i] == "<" )&& tokstr[i + 1] == "=")
-		//if ((tokstr[i] == "+" || tokstr[i] == "-" || tokstr[i] == "*" || tokstr[i] == "/" || tokstr[i] == ">" || tokstr[i] == "<" || tokstr[i] == "!") && tokstr[i + 1] == "=")
+		if ((tokstr[i] == ">" || tokstr[i] == "<") && tokstr[i + 1] == "=")
+			//if ((tokstr[i] == "+" || tokstr[i] == "-" || tokstr[i] == "*" || tokstr[i] == "/" || tokstr[i] == ">" || tokstr[i] == "<" || tokstr[i] == "!") && tokstr[i + 1] == "=")
 		{
 			tokstr[i].append("=");
 			tokstr.erase(tokstr.begin() + i + 1);
@@ -152,7 +152,7 @@ void lexer::tokenize(const string str, vector<Token> &vtoken)
 	//토큰화
 	for (int i = 0; i < tokstr.size(); i++)
 	{
-		if (tokstr[i] == "참거짓"|| tokstr[i] == "bool")
+		if (tokstr[i] == "참거짓" || tokstr[i] == "bool")
 		{
 			temptoken.TokenType = Bool;
 			temptoken.TokenName = tokstr[i];
@@ -268,9 +268,9 @@ void lexer::tokenize(const string str, vector<Token> &vtoken)
 		}
 		else if (tokstr[i] == "=")
 		{
-		temptoken.TokenType = Assign;
-		temptoken.TokenName = tokstr[i];
-		temptoken.TokenValue = tokstr[i];
+			temptoken.TokenType = Assign;
+			temptoken.TokenName = tokstr[i];
+			temptoken.TokenValue = tokstr[i];
 		}
 		else if (tokstr[i] == "==")
 		{
@@ -362,6 +362,18 @@ void lexer::tokenize(const string str, vector<Token> &vtoken)
 			temptoken.TokenName = tokstr[i];
 			temptoken.TokenValue = tokstr[i];
 		}
+		else if (tokstr[i] == "문자열" || tokstr[i] == "string")
+		{
+			temptoken.TokenType = (TokenType)String;
+			temptoken.TokenName = tokstr[i];
+			temptoken.TokenValue = tokstr[i];
+		}
+		else if (tokstr[i] == "\"")
+		{
+		temptoken.TokenType = DoubleQuotation;
+		temptoken.TokenName = tokstr[i];
+		temptoken.TokenValue = tokstr[i];
+		}
 		else
 		{
 			if (isDigit(tokstr[i]))
@@ -387,7 +399,7 @@ void lexer::tokenize(const string str, vector<Token> &vtoken)
 		{
 			if (isThereIllegalChar(i.TokenName))
 			{
-				cout<<"Identifier\t" << i.TokenName << endl;
+				cout << "Identifier\t" << i.TokenName << endl;
 				assert(false && "IllegalChar Detected");
 			}
 		}
@@ -410,6 +422,40 @@ void lexer::tokenize(const string str, vector<Token> &vtoken)
 
 				i = 0;
 			}
+		}
+	}
+
+	//문자
+	for (int i = 0; i < vtoken.size(); i++)
+	{
+		if (i >= vtoken.size() - 3) break;
+		if (vtoken[i].TokenType == SingleQuotation)
+		{
+			assert((vtoken[i + 2].TokenType == SingleQuotation) && "SingleQuotation 오류");
+			Token temp;
+			temp.TokenType = (TokenType)CharLiteral;
+			temp.TokenName = vtoken[i + 1].TokenName;
+			temp.TokenValue = vtoken[i + 1].TokenName;
+			vtoken[i] = temp;
+			vtoken.erase(vtoken.begin() + i + 1, vtoken.begin() + i + 3);
+			i = 0;
+		}
+	}
+
+	//문자열
+	for (int i = 0; i < vtoken.size(); i++)
+	{
+		if (i >= vtoken.size() - 3) break;
+		if (vtoken[i].TokenType == DoubleQuotation)
+		{
+			assert((vtoken[i + 2].TokenType == DoubleQuotation) && "DoubleQuotation 오류");
+			Token temp;
+			temp.TokenType = (TokenType)StringLiteral;
+			temp.TokenName = vtoken[i + 1].TokenName;
+			temp.TokenValue = vtoken[i + 1].TokenName;
+			vtoken[i] = temp;
+			vtoken.erase(vtoken.begin() + i + 1, vtoken.begin() + i + 3);
+			i = 0;
 		}
 	}
 
@@ -458,7 +504,6 @@ void lexer::tokenize(const string str, vector<Token> &vtoken)
 	//temptoken.TokenValue = "Eol";
 	//temptoken.TokenType = Eol;
 	//vtoken.push_back(temptoken);
-
 
 
 }
@@ -540,7 +585,7 @@ void lexer::showAllToken() {
 		{
 			cout << "FloatLiteral\t" << i.TokenName << endl;
 		}
-		else if (i.TokenType == Eol)	
+		else if (i.TokenType == Eol)
 		{
 
 		}

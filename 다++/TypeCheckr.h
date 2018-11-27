@@ -1,6 +1,5 @@
 #pragma once
 #include "stdafx.h"
-#include "parser.h"
 struct TypeMap {
 	TokenType type;
 	string name;

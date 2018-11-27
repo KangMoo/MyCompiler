@@ -3,10 +3,22 @@
 #include "parser.h"
 #include "AST.h"
 #include "TypeCheckr.h"
+#include "CodeGenerator.h"
 using namespace std;
 
 int main()
 {
+	//test~
+	ofstream test;
+	test.open("tttt.txt");
+	string strtest;
+	strtest = "int main() { \n int a;\nchar b = \'A\';\n return 0;\n}\n";
+	string strtest2 = strtest;
+	strtest += strtest2;
+	test << strtest << endl;
+	test.close();
+	cout << "WHATTTTTTTTTTTTTTTTTTTTTT" << endl;
+	//~test
 	char filename[] = "test.txt";
 
 	//렉서
@@ -25,9 +37,15 @@ int main()
 	_ast->display();
 
 	//타입체커
-	TypeCheckr* _tc = new TypeCheckr;
+	TypeCheckr* _tc = new TypeCheckr();
 	_tc->typeCheck((Statement*)_parser->getBlock(),0);
 	//_tc->showTypeMap();
+
+	//코드생성
+	CodeGenerator* _cg = new CodeGenerator();
+	_cg->setFileName("generatedCode.txt");
+	_cg->setBodyBlock(_parser->getBlock());
+	_cg->mkCode();
 	system("pause");
 	return 0;
 }
