@@ -8,17 +8,6 @@ using namespace std;
 
 int main()
 {
-	//test~
-	ofstream test;
-	test.open("tttt.txt");
-	string strtest;
-	strtest = "int main() { \n int a;\nchar b = \'A\';\n return 0;\n}\n";
-	string strtest2 = strtest;
-	strtest += strtest2;
-	test << strtest << endl;
-	test.close();
-	cout << "WHATTTTTTTTTTTTTTTTTTTTTT" << endl;
-	//~test
 	char filename[] = "test.txt";
 
 	//·º¼­
