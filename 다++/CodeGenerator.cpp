@@ -91,7 +91,6 @@ string CodeGenerator::generateAssignment(Assignment * a, int tab)
 string CodeGenerator::generateConditional(Conditional * c, int tab)
 {
 	string str = "";
-
 	str += tabSet(tab);
 	str += "if";
 	str += "(";
@@ -101,13 +100,32 @@ string CodeGenerator::generateConditional(Conditional * c, int tab)
 	str += generateStatement(c->thenBranch, tab);
 	//str += tabSet(--tab) + "}\n";
 
-	if (c->isTherElsebranch)
+	for (auto i : c->elseIfBranch)
 	{
-		str += tabSet(tab) + "else";
+		str += generateEIConditional(i,tab);
+	}
+
+	if (c->isThereElsebranch)
+	{
+		str += tabSet(tab) + "else\n";
 		//str += tabSet(tab++) + "{\n";
 		str += generateStatement(c->elseBranch, tab);
 		//str += tabSet(--tab) + "}\n";
 	}
+	return str;
+}
+
+string CodeGenerator::generateEIConditional(Conditional * ec, int tab)
+{
+	string str = "";
+	str += tabSet(tab);
+	str += "else if";
+	str += "(";
+	str += generateExpression(ec->test);
+	str += ")\n";
+	//str += tabSet(tab++) + "{\n";
+	str += generateStatement(ec->thenBranch, tab);
+	//str += tabSet(--tab) + "}\n";
 	return str;
 }
 
@@ -139,6 +157,9 @@ string CodeGenerator::generateDeclaration(Declaration * d, int tab)
 	case (TokenType)Char:
 		str += "char ";
 		break;
+	case (TokenType)String:
+		str += "string ";
+		break;
 	case (TokenType)Bool:
 		str += "bool ";
 		break;
@@ -156,7 +177,7 @@ string CodeGenerator::generateDeclaration(Declaration * d, int tab)
 	return str;
 }
 
-string CodeGenerator::generateBlock(Block * b, int tab)
+string CodeGenerator::generateBlock(Block * b, int tab,bool mainBlock)
 {
 	string str = "";
 	if (b->isThereBrace)
@@ -170,6 +191,7 @@ string CodeGenerator::generateBlock(Block * b, int tab)
 	}
 	if (b->isThereBrace)
 	{
+		if (mainBlock) str += tabSet(tab) + "return 0;\n";
 		str += tabSet(--tab) + "}\n";
 	}
 	return str;
@@ -196,6 +218,10 @@ string CodeGenerator::generateValue(Value * v)
 	else if (v->type == CharLiteral)
 	{
 		str += to_string(v->charValue);
+	}
+	else if (v->type == StringLiteral)
+	{
+		str += "\"" +v->stringValue + "\"";
 	}
 	else if (v->type == True)
 	{
@@ -229,20 +255,42 @@ string CodeGenerator::generateUnary(Unary * u)
 	return str;
 }
 
-void CodeGenerator::mkCode()
+void CodeGenerator::mkCode(bool mkcpp)
 {
-	_file.open(_fileName);
-	int tab = 0;
-	_file << mkCodeStart();
-	string str = generateBlock(_block,0);
-	_file << str;
-	_file.close();
+	if (mkcpp)
+	{
+		_file.open(_fileName);
+		int tab = 0;
+		_file << mkCodeStart(mkcpp);
+		string str = generateBlock(_block, 0, true);
+		_file << str;
+		_file.close();
+	}
+	else
+	{
+		_file.open(_fileName);
+		int tab = 0;
+		_file << mkCodeStart();
+		string str = generateBlock(_block, 0, true);
+		_file << str;
+		_file.close();
+	}
 }
 
-string CodeGenerator::mkCodeStart()
+string CodeGenerator::mkCodeStart(bool mkcpp)
 {
 	string str = "";
-	str += "#include <iostream>\n";
-	str += "int main()\n";
+	if (mkcpp)
+	{
+		str += "#include \"generatedCode.h\"\n";
+		str += "using namespace std;\n";
+		str += "int generatedCode::main()\n";
+	}
+	else
+	{
+		str += "#include <iostream>\n";
+		str += "using namespace std;\n";
+		str += "int main()\n";
+	}
 	return str;
 }

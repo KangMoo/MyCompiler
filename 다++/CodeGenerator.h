@@ -13,9 +13,10 @@ private:
 	string generateExpression(Expression* e);
 	string generateAssignment(Assignment* a, int tab);
 	string generateConditional(Conditional* c, int tab);
+	string generateEIConditional(Conditional* ec, int tab);
 	string generateLoop(Loop* l, int tab);
 	string generateDeclaration(Declaration* d, int tab);
-	string generateBlock(Block* b, int tab);
+	string generateBlock(Block* b, int tab,bool mainBlock = false);
 
 	//Expression Code Generate
 	string generateVariable(Variable* v);
@@ -25,8 +26,8 @@ private:
 	string tabSet(int c);
 public:
 
-	void mkCode();
-	string mkCodeStart();
+	void mkCode(bool mkcpp = false);
+	string mkCodeStart(bool mkcpp = false);
 	void setBodyBlock(Block* block) { _block = block; };
 	void setFileName(string fileName) { _fileName = fileName; };
 	CodeGenerator(string fileName, Block* block) { _fileName = fileName; _block = block; };

@@ -17,7 +17,7 @@ void parser::setTokenVector(vector<Token> vtoken)
 
 bool parser::isStatement()
 {
-	if (_token.TokenType == (TokenType)Int || _token.TokenType == (TokenType)Char || _token.TokenType == (TokenType)Bool || _token.TokenType == (TokenType)Float ||
+	if (_token.TokenType == (TokenType)Int || _token.TokenType == (TokenType)Char || _token.TokenType == (TokenType)String|| _token.TokenType == (TokenType)Bool || _token.TokenType == (TokenType)Float ||
 		_token.TokenType == (TokenType)Semicolon || _token.TokenType == (TokenType)LeftBrace || _token.TokenType == (TokenType)If ||
 		_token.TokenType == (TokenType)While || _token.TokenType == (TokenType)Identifier)
 	{
@@ -70,7 +70,7 @@ Block* parser::Statements()
 Statement * parser::statementf()
 {
 	Statement *temp = new Statement();
-	if (_token.TokenType == (TokenType)Int || _token.TokenType == (TokenType)Char || _token.TokenType == (TokenType)Float || _token.TokenType == (TokenType)Bool)
+	if (_token.TokenType == (TokenType)Int || _token.TokenType == (TokenType)Char || _token.TokenType == (TokenType)String|| _token.TokenType == (TokenType)Float || _token.TokenType == (TokenType)Bool || _token.TokenType == (TokenType)Array)
 	{
 		temp = declaration();
 	}
@@ -120,16 +120,40 @@ Statement* parser::Skip()
 
 Conditional* parser::Ifstatement()
 {
+	bool isThereElseIf = false;
 	match((TokenType)If);
 	match((TokenType)LeftParen);
 	Expression *ex = expression();
 	match((TokenType)RightParen);
 	Statement* state = statementf();
+	vector<Conditional*> vc;
+	while (_token.TokenType == (TokenType)ElseIf)
+	{
+		vc.push_back(ElseIfstatement());
+		isThereElseIf = true;
+	}
+	int stop = 0;
 	if (_token.TokenType == (TokenType)Else)
 	{
 		match((TokenType)Else);
+		if (isThereElseIf)
+		{
+			return new Conditional(ex, state, statementf(), vc);
+		}
 		return new Conditional(ex, state, statementf());
 	}
+	if(isThereElseIf)
+		return new Conditional(ex, state, vc);
+	return new Conditional(ex, state);
+}
+
+Conditional * parser::ElseIfstatement()
+{
+	match((TokenType)ElseIf);
+	match((TokenType)LeftParen);
+	Expression *ex = expression();
+	match((TokenType)RightParen);
+	Statement* state = statementf();
 	return new Conditional(ex, state);
 }
 
@@ -144,16 +168,30 @@ Loop* parser::WhileStatement()
 
 Block* parser::declaration()
 {
+	bool isItArray = false;
+	int arrnum = 0;
+	if (_token.TokenType == (TokenType)Array)
+	{
+		isItArray = true;
+		arrnum = getArrayDemension(_token.TokenValue);
+		match(_token.TokenType);
+	}
+	
 	Block* b = new Block(false);
 	Block* b2 = new Block(false);
 	Declaration* d = new Declaration();
 	Assignment* a = new Assignment();
-	d->valueType = match(_token.TokenType);
+	if (_token.TokenType == (TokenType)Int || _token.TokenType == (TokenType)Char || _token.TokenType == (TokenType)Float || _token.TokenType == (TokenType)String)
+	{
+		d->valueType = match(_token.TokenType);
+	}
 	// 선언 ~
 	if (_token.TokenType == (TokenType)Identifier)
 	{
 		d->valueName.push_back(_token.TokenName);
 		Variable* vartemp = new Variable(_token);
+		if (isItArray)
+			vartemp = new Variable(_token, arrnum);
 		match(_token.TokenType);
 
 		// 선언 및 정의 ~
@@ -162,7 +200,8 @@ Block* parser::declaration()
 			match(_token.TokenType);
 			if (_token.TokenType == (TokenType)IntLiteral ||
 				_token.TokenType == (TokenType)FloatLiteral ||
-				_token.TokenType == (TokenType)CharLiteral)
+				_token.TokenType == (TokenType)CharLiteral||
+				_token.TokenType == (TokenType)StringLiteral)
 			{
 				Value* valtemp = new Value(_token);
 				match(_token.TokenType);
@@ -181,6 +220,8 @@ Block* parser::declaration()
 			{
 				d->valueName.push_back(_token.TokenName);
 				Variable* vartemp = new Variable(_token);
+				if (isItArray)
+					vartemp = new Variable(_token, arrnum);
 				match(_token.TokenType);
 				// 선언 및 정의 ~
 				if (_token.TokenType == (TokenType)Assign)
@@ -188,7 +229,8 @@ Block* parser::declaration()
 					match(_token.TokenType);
 					if (_token.TokenType == (TokenType)IntLiteral ||
 						_token.TokenType == (TokenType)FloatLiteral ||
-						_token.TokenType == (TokenType)CharLiteral)
+						_token.TokenType == (TokenType)CharLiteral||
+						_token.TokenType == (TokenType)StringLiteral)
 					{
 						Value* valtemp = new Value(_token);
 						match(_token.TokenType);
@@ -309,7 +351,7 @@ Expression* parser::primary()
 		e = new Variable(_token);
 		match(_token.TokenType);
 	}
-	else if (_token.TokenType == IntLiteral || _token.TokenType == CharLiteral || _token.TokenType == FloatLiteral || _token.TokenType == True || _token.TokenType == False)
+	else if (_token.TokenType == IntLiteral || _token.TokenType == CharLiteral|| _token.TokenType == (TokenType)StringLiteral || _token.TokenType == FloatLiteral || _token.TokenType == True || _token.TokenType == False)
 	{
 		e = new Value(_token);
 		match(_token.TokenType);
@@ -320,7 +362,7 @@ Expression* parser::primary()
 		e = expression();
 		match(RightParen);
 	}
-	else if (_token.TokenType == Int || _token.TokenType == Char || _token.TokenType == Float || _token.TokenType == Bool)
+	else if (_token.TokenType == Int || _token.TokenType == Char || _token.TokenType == Float || _token.TokenType == (TokenType)String|| _token.TokenType == Bool)
 	{
 		string val = _token.TokenValue;
 		Operator* op = new Operator(val);
@@ -337,6 +379,21 @@ Expression* parser::primary()
 		assert(false && "Primary Error");
 	}
 	return e;
+}
+
+int parser::getArrayDemension(string str)
+{
+	int arrDemension = 0;
+	for (int i = 0; i < str.size(); i++)
+	{
+		if ('0' <= str[i] && str[i] <= '9')
+		{
+			arrDemension = i + 1;
+		}
+		else
+			break;
+	}
+	return arrDemension;
 }
 
 TokenType parser::match(TokenType tokenType)

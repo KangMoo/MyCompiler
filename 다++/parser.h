@@ -20,6 +20,7 @@ private:
 	Assignment* assignment();
 	Statement* Skip();
 	Conditional* Ifstatement();
+	Conditional* ElseIfstatement();
 	Loop* WhileStatement();
 	Block* declaration();
 	//
@@ -32,7 +33,7 @@ private:
 	Expression* factor();
 	Expression* primary();
 	//
-
+	int getArrayDemension(string str);
 public:
 	void init();
 	void parse();

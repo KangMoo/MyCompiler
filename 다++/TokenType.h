@@ -1,6 +1,6 @@
 #pragma once
 enum TokenType {
-	Bool, Char, Else, False, Float, String,
+	Bool, Char, Else, False, Float, String, Array,
 	If, ElseIf, Int, Main, True, While,Eol,
 	Eof, LeftBrace, RightBrace, LeftBracket, RightBracket,
 	LeftParen, RightParen, Semicolon, Comma, Assign,

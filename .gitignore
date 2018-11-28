@@ -29,3 +29,12 @@ Debug/다++.exe
 다++/generatedCode.txt
 다++/Debug/CodeGenerator.obj
 .vs/다++/v15/ipch/AutoPCH/1a47feef421fe679/CODEGENERATOR.ipch
+다++/generatedCode.h
+다++/generatedCode.cpp
+다++/Debug/다++.Build.CppClean.log
+다++/Debug/parser.obj.enc
+다++/Debug/genratedCode.obj
+다++/Debug/generatedCode.obj
+다++/Debug/ast.obj.enc
+.vs/다++/v15/ipch/AutoPCH/ad75b2024c899f58/GENRATEDCODE.ipch
+.vs/다++/v15/ipch/AutoPCH/755ccdc0dd00ed7d/GENERATEDCODE.ipch

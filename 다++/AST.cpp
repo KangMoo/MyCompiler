@@ -19,7 +19,7 @@ void AST::displayBlock(Block * b, int tab)
 	{
 		tabSet(tab); cout << "<Block>" << endl;
 		tabSet(tab++); cout << "{" << endl;
-		
+
 	}
 	for (int i = 0; i < b->members.size(); i++)
 	{
@@ -29,7 +29,7 @@ void AST::displayBlock(Block * b, int tab)
 	{
 		tabSet(--tab); cout << "}" << endl;
 	}
-	
+
 }
 
 void AST::displayStatement(Statement * s, int tab)
@@ -101,13 +101,27 @@ void AST::displayConditional(Conditional * c, int tab)
 	tabSet(tab++); cout << "{" << endl;
 	displayStatement(c->thenBranch, tab);
 	tabSet(--tab); cout << "}" << endl;
-	if (c->isTherElsebranch)
+	for (auto i : c->elseIfBranch)
+	{
+		displayEIConditional(i, tab);
+	}
+	if (c->isThereElsebranch)
 	{
 		tabSet(tab); cout << "<Else>" << endl;
 		tabSet(tab++); cout << "{" << endl;
 		displayStatement(c->elseBranch, tab);
 		tabSet(--tab); cout << "}" << endl;
 	}
+}
+
+void AST::displayEIConditional(Conditional * c, int tab)
+{
+	tabSet(tab); cout << "<Else If>" << endl;
+	tabSet(tab); cout << "Else If Condition:"; displayExpression(c->test); cout << endl;
+	tabSet(tab++); cout << "{" << endl;
+	displayStatement(c->thenBranch, tab);
+	tabSet(--tab); cout << "}" << endl;
+
 }
 
 void AST::displayLoop(Loop * l, int tab)
@@ -134,6 +148,9 @@ void AST::displayDeclaration(Declaration* d, int tab)
 		break;
 	case (TokenType)Char:
 		cout << "Char";
+		break;
+	case (TokenType)String:
+		cout << "String";
 		break;
 	case (TokenType)Bool:
 		cout << "Bool";
@@ -165,6 +182,10 @@ void AST::displayValue(Value * v)
 	else if (v->type == CharLiteral)
 	{
 		cout << "(char:" << v->charValue << ")";
+	}
+	else if (v->type == StringLiteral)
+	{
+		cout << "(string:" << v->stringValue << ")";
 	}
 	else if (v->type == True)
 	{

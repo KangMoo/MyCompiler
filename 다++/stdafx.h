@@ -8,6 +8,8 @@
 #include <fstream>
 #include <algorithm>
 
+#define GENERATEFILE 
+
 using namespace std;
 
 typedef struct TOKEN {
@@ -43,6 +45,8 @@ public:
 	float floatValue;
 	bool boolValue;
 	char charValue;
+	int arrDemension;
+	string stringValue;
 public:
 	Variable() {};
 	Variable(Token t) {
@@ -60,6 +64,10 @@ public:
 		{
 			charValue = t.TokenValue[0];
 		}
+		else if (type == StringLiteral)
+		{
+			stringValue = t.TokenValue;
+		}
 		else if (type == True)
 		{
 			boolValue = true;
@@ -68,6 +76,37 @@ public:
 		{
 			boolValue = false;
 		}
+		arrDemension = 0;
+		StatementName = "Variable";
+	}
+	Variable(Token t,int d) {
+		type = t.TokenType;
+		id = t.TokenName;
+		if (type == IntLiteral)
+		{
+			intValue = stoi(t.TokenValue);
+		}
+		else if (type == FloatLiteral)
+		{
+			floatValue = stof(t.TokenValue);
+		}
+		else if (type == CharLiteral)
+		{
+			charValue = t.TokenValue[0];
+		}
+		else if (type == StringLiteral)
+		{
+			stringValue = t.TokenValue;
+		}
+		else if (type == True)
+		{
+			boolValue = true;
+		}
+		else if (type == False)
+		{
+			boolValue = false;
+		}
+		arrDemension = d;
 		StatementName = "Variable";
 	}
 };
@@ -79,6 +118,7 @@ public:
 	float floatValue;
 	bool boolValue;
 	char charValue;
+	string stringValue;
 public:
 	Value(Token t) {
 		type = t.TokenType;
@@ -94,6 +134,10 @@ public:
 		else if (type == CharLiteral)
 		{
 			charValue = t.TokenValue[0];
+		}
+		else if (type == StringLiteral)
+		{
+			stringValue = t.TokenValue;
 		}
 		else if (type == True)
 		{
@@ -151,12 +195,21 @@ class Conditional : public Statement {
 public:
 	Expression* test;
 	Statement* thenBranch;
+	vector<Conditional*> elseIfBranch;
 	Statement* elseBranch;
-	bool isTherElsebranch = false;
+	bool isThereElsebranch = false;
+	bool isThereElseIfbranch = false;
 	Conditional() { StatementName = "Conditional"; };
-	Conditional(Expression* t, Statement* tp) { StatementName = "Conditional"; test = t; thenBranch = tp; isTherElsebranch = false; };
+	Conditional(Expression* t, Statement* tp) { StatementName = "Conditional"; test = t; thenBranch = tp; isThereElsebranch = false; isThereElseIfbranch = false;
+	};
 	Conditional(Expression* t, Statement* tp, Statement* ep) {
-		StatementName = "Conditional"; test = t; thenBranch = tp; elseBranch = ep; isTherElsebranch = true;
+		StatementName = "Conditional"; test = t; thenBranch = tp; elseBranch = ep; isThereElsebranch = true; isThereElseIfbranch = false;
+	};
+	Conditional(Expression* t, Statement* tp, Statement* ep, vector<Conditional*> ei) {
+		StatementName = "Conditional"; test = t; thenBranch = tp; elseBranch = ep; elseIfBranch = ei;  isThereElsebranch = true; isThereElseIfbranch = true;
+	};
+	Conditional(Expression* t, Statement* tp, vector<Conditional*> ei) {
+		StatementName = "Conditional"; test = t; thenBranch = tp;  elseIfBranch = ei; isThereElsebranch = false; isThereElseIfbranch = true;
 	};
 };
 class Loop : public Statement {
@@ -174,5 +227,10 @@ public:
 	vector<Assignment*> assign;
 	Declaration() { StatementName = "Declaration"; };
 };
-
+class arrInformation {
+	int arrDemension;
+	vector<int> arrMaxSize;
+	arrInformation() {};
+	arrInformation(int d) { arrDemension = d; arrMaxSize.assign(d, 0); };
+};
 #define ARRAY_LEN(X) (sizeof(X)/sizeof(X[0]))

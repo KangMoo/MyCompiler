@@ -20,7 +20,7 @@ void TypeCheckr::typeCheck(Statement * s, const int tsp)
 		Conditional* c = (Conditional*)s;
 		typeCheck(c->test);
 		typeCheck(c->thenBranch, nowTypeMapSP);
-		if (c->isTherElsebranch) 
+		if (c->isThereElsebranch)
 		{
 			typeCheck(c->elseBranch, nowTypeMapSP);
 		}
@@ -42,7 +42,7 @@ void TypeCheckr::typeCheck(Statement * s, const int tsp)
 			nowTypeMapSP++;
 		}
 	}
-	else if(s->StatementName == "Block")
+	else if (s->StatementName == "Block")
 	{
 		Block* b = (Block*)s;
 		for (auto i : b->members)
@@ -51,6 +51,7 @@ void TypeCheckr::typeCheck(Statement * s, const int tsp)
 		}
 		if (b->isThereBrace)
 		{
+			if(_typeMap.size() < nowTypeMapSP)
 			_typeMap.erase(_typeMap.begin() + nowTypeMapSP + 1, _typeMap.end());
 		}
 	}

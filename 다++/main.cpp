@@ -4,6 +4,7 @@
 #include "AST.h"
 #include "TypeCheckr.h"
 #include "CodeGenerator.h"
+//#include "generatedCode.h"
 using namespace std;
 
 int main()
@@ -13,7 +14,7 @@ int main()
 	//렉서
 	lexer* _lexer = new lexer(filename);
 	_lexer->makeToken();
-	//_lexer->showAllToken();
+	_lexer->showAllToken();
 
 	//파서
 	parser* _parser = new parser();
@@ -35,6 +36,23 @@ int main()
 	_cg->setFileName("generatedCode.txt");
 	_cg->setBodyBlock(_parser->getBlock());
 	_cg->mkCode();
+
+	//_cg->setFileName("generatedCode.cpp");
+	//_cg->setBodyBlock(_parser->getBlock());
+	//_cg->mkCode(true);
+
+	//string st;
+	//cout << "코드가 생성되었습니다. 실행시키려면 y를 입력하십시오." << endl;
+	//cin >> st;
+
+
+	//if (st == "y")
+	//{
+	//	generatedCode* _gc = new generatedCode();
+	//	_gc->main();
+	//}
+
+
 	system("pause");
 	return 0;
 }

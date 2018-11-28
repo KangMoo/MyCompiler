@@ -1,6 +1,5 @@
 #pragma once
 #include "stdafx.h"
-//using namespace std;
 
 class lexer
 {
@@ -10,11 +9,15 @@ private:
 	string argv;
 	bool isEof = false;
 	int lineNum = 1;
-	void tokenize(const string str, vector<Token> &vtoken);
-public:
+	void tokenize(string str, vector<Token> &vtoken);
+	void tokenCheck(vector<Token> &vtoken);
+
 	bool isThereIllegalChar(string str);
 	bool isDigit(char ch);
 	bool isDigit(string str);
+	bool isItArrayDeclare(string str);
+	bool isItArrayFactor(string str);
+public:
 	void makeToken();
 	void showAllToken();
 	int getNowTokenNum();
