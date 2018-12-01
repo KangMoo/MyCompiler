@@ -3,6 +3,7 @@
 struct TypeMap {
 	TokenType type;
 	string name;
+	int arrDemension;
 };
 class TypeCheckr
 {
@@ -13,6 +14,7 @@ private:
 	//TokenType typeof(Expression* e);
 	bool isInTypeMap(Expression* e);
 	bool isInTypeMap(string str);
+	int getDemension(Expression* e);
 public:
 	//void typeCheck(Block* b, const int tsp);
 	void typeCheck(Statement* s, const int tsp);

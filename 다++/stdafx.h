@@ -1,4 +1,5 @@
 #pragma once
+
 #include "TokenType.h"
 //#include "Token.h"
 #include <string>
@@ -7,8 +8,6 @@
 #include <vector>
 #include <fstream>
 #include <algorithm>
-
-#define GENERATEFILE 
 
 using namespace std;
 
@@ -46,40 +45,11 @@ public:
 	bool boolValue;
 	char charValue;
 	int arrDemension;
+	vector<int> arrNum;
 	string stringValue;
 public:
 	Variable() {};
-	Variable(Token t) {
-		type = t.TokenType;
-		id = t.TokenName;
-		if (type == IntLiteral)
-		{
-			intValue = stoi(t.TokenValue);
-		}
-		else if (type == FloatLiteral)
-		{
-			floatValue = stof(t.TokenValue);
-		}
-		else if (type == CharLiteral)
-		{
-			charValue = t.TokenValue[0];
-		}
-		else if (type == StringLiteral)
-		{
-			stringValue = t.TokenValue;
-		}
-		else if (type == True)
-		{
-			boolValue = true;
-		}
-		else if (type == False)
-		{
-			boolValue = false;
-		}
-		arrDemension = 0;
-		StatementName = "Variable";
-	}
-	Variable(Token t,int d) {
+	Variable(Token t,int d = 0) {
 		type = t.TokenType;
 		id = t.TokenName;
 		if (type == IntLiteral)
@@ -107,6 +77,7 @@ public:
 			boolValue = false;
 		}
 		arrDemension = d;
+		arrNum.assign(arrDemension,0);
 		StatementName = "Variable";
 	}
 };
@@ -223,9 +194,12 @@ public:
 class Declaration : public Statement {
 public:
 	TokenType valueType;
+	int arrDemension;
 	vector<string> valueName;
 	vector<Assignment*> assign;
-	Declaration() { StatementName = "Declaration"; };
+	Declaration(int d = 0) {
+		StatementName = "Declaration"; arrDemension = d;
+	};
 };
 class arrInformation {
 	int arrDemension;

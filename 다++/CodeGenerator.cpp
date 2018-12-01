@@ -82,6 +82,12 @@ string CodeGenerator::generateAssignment(Assignment * a, int tab)
 	string str = "";
 	str += tabSet(tab);
 	str += a->target->id;
+	for (auto i : a->target->arrNum)
+	{
+		str += "[";
+		str += to_string(i);
+		str += "]";
+	}
 	str += "=";
 	str += generateExpression(a->source);
 	str += ";\n";
@@ -146,25 +152,35 @@ string CodeGenerator::generateDeclaration(Declaration * d, int tab)
 	string str = "";
 
 	str += tabSet(tab);
+	for (int i = 0; i < d->arrDemension; i++)
+	{
+		str += "vector<";
+	}
+
 	switch (d->valueType)
 	{
 	case (TokenType)Int:
-		str += "int ";
+		str += "int";
 		break;
 	case (TokenType)Float:
-		str += "float ";
+		str += "float";
 		break;
 	case (TokenType)Char:
-		str += "char ";
+		str += "char";
 		break;
 	case (TokenType)String:
-		str += "string ";
+		str += "string";
 		break;
 	case (TokenType)Bool:
-		str += "bool ";
+		str += "bool";
 		break;
 	}
 
+	for (int i = 0; i < d->arrDemension; i++)
+	{
+		str += ">";
+	}
+	str += " ";
 	for (int i = 0; i < d->valueName.size(); i++)
 	{
 		str += d->valueName[i];
@@ -201,6 +217,12 @@ string CodeGenerator::generateVariable(Variable * v)
 {
 	string str = "";
 	str += v->id;
+	for (auto i : v->arrNum)
+	{
+		str += "[";
+		str += to_string(i);
+		str += "]";
+	}
 	return str;
 }
 

@@ -8,6 +8,9 @@ void TypeCheckr::typeCheck(Statement * s, const int tsp)
 		Assignment* a = (Assignment*)s;
 		typeCheck(a->target);
 		typeCheck(a->source);
+		int temp1 = getDemension(a->target);
+		int temp2 = getDemension(a->source);
+		assert(temp1 == temp2 && "Assignment Error : Different Demension Calculation");
 	}
 	else if (s->StatementName == "Loop")
 	{
@@ -38,6 +41,7 @@ void TypeCheckr::typeCheck(Statement * s, const int tsp)
 			TypeMap ttemp;
 			ttemp.type = t;
 			ttemp.name = j;
+			ttemp.arrDemension = d->arrDemension;
 			_typeMap.push_back(ttemp);
 			nowTypeMapSP++;
 		}
@@ -78,6 +82,9 @@ void TypeCheckr::typeCheck(Expression * e)
 		Binary* b = ((Binary*)e);
 		typeCheck(b->term1);
 		typeCheck(b->term2);
+		int temp1 = getDemension(b->term1);
+		int temp2 = getDemension(b->term2);
+		assert(temp1 == temp2 && "Binary Error : Different Demension Calculation");
 	}
 	else if (e->StatementName == "Unary")
 	{
@@ -108,6 +115,44 @@ bool TypeCheckr::isInTypeMap(string str)
 		}
 	}
 	return false;
+}
+
+int TypeCheckr::getDemension(Expression * e)
+{
+	int demension = 0;
+
+	if (e->StatementName == "Value")
+	{
+		demension = 0;
+	}
+	else if (e->StatementName == "Variable")
+	{
+		if (!isInTypeMap(((Variable*)e)->id))
+		{
+			assert(false && "TypeMap Error (Undefined Variable used)");
+		}
+		int tempdemension = 0;
+		for (auto i : _typeMap)
+		{
+			if (i.name == ((Variable*)e)->id)
+				tempdemension = i.arrDemension;
+		}
+
+		demension = tempdemension- ((Variable*)e)->arrNum.size();
+	}
+	else if (e->StatementName == "Binary")
+	{
+		Binary* b = ((Binary*)e);
+		int temp1 = getDemension(b->term1);
+		int temp2 = getDemension(b->term2);
+		assert(temp1 == temp2 && "Binary Error : Different Demension Calculation");
+	}
+	else if (e->StatementName == "Unary")
+	{
+		Unary* u = ((Unary*)e);
+		demension = getDemension(u->term);
+	}
+	return demension;
 }
 
 //void TypeCheckr::typeCheck(Block * b, const int tsp)

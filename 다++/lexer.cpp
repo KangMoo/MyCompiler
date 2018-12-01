@@ -38,7 +38,7 @@ void lexer::tokenize(string str, vector<Token> &vtoken)
 		if (str[i] == '+' || str[i] == '-' || str[i] == '*' || str[i] == '/' || str[i] == ',' || str[i] == '.' ||
 			str[i] == ';' || str[i] == '{' || str[i] == '}' || str[i] == '(' || str[i] == ')' || str[i] == '&' ||
 			str[i] == '|' || str[i] == '!' || str[i] == ' ' || str[i] == '\t' || str[i] == '\r' || str[i] == '?' || str[i] == '='
-			|| str[i] == '<' || str[i] == '>' || str[i] == '\'' || str[i] == '\"')
+			|| str[i] == '<' || str[i] == '>' || str[i] == '\'' || str[i] == '\"' || str[i] == '[' || str[i] == ']')
 		{
 			tkp.push_back(i);
 		}
@@ -472,16 +472,17 @@ void lexer::tokenCheck(vector<Token>& vtoken)
 	}
 
 	//배열 선언 체크
-	for (auto i : vtoken)
+	for (int i = 0; i < vtoken.size(); i++)
 	{
-		if (i.TokenType == Identifier)
+		if (vtoken[i].TokenType == Identifier)
 		{
-			if (isItArrayDeclare(i.TokenName))
+			if (isItArrayDeclare(vtoken[i].TokenName))
 			{
-				i.TokenType = (TokenType)Array;
+				vtoken[i].TokenType = (TokenType)Array;
 			}
 		}
 	}
+	
 
 	//배열 인자 체크
 	//for (int i = 0; i < vtoken.size(); i++)

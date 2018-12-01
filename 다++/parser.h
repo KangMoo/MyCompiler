@@ -18,11 +18,13 @@ private:
 	Block* Statements();
 	Statement* statementf();
 	Assignment* assignment();
+	Assignment* arrAssignmnet();
 	Statement* Skip();
 	Conditional* Ifstatement();
 	Conditional* ElseIfstatement();
 	Loop* WhileStatement();
 	Block* declaration();
+	Block* arrDeclaration();
 	//
 	Expression* expression();
 	Expression* conjunction();
@@ -34,6 +36,7 @@ private:
 	Expression* primary();
 	//
 	int getArrayDemension(string str);
+	
 public:
 	void init();
 	void parse();

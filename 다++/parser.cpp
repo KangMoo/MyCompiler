@@ -17,7 +17,7 @@ void parser::setTokenVector(vector<Token> vtoken)
 
 bool parser::isStatement()
 {
-	if (_token.TokenType == (TokenType)Int || _token.TokenType == (TokenType)Char || _token.TokenType == (TokenType)String|| _token.TokenType == (TokenType)Bool || _token.TokenType == (TokenType)Float ||
+	if (_token.TokenType == (TokenType)Int || _token.TokenType == (TokenType)Char || _token.TokenType == (TokenType)String || _token.TokenType == (TokenType)Bool || _token.TokenType == (TokenType)Float || _token.TokenType == (TokenType)Array ||
 		_token.TokenType == (TokenType)Semicolon || _token.TokenType == (TokenType)LeftBrace || _token.TokenType == (TokenType)If ||
 		_token.TokenType == (TokenType)While || _token.TokenType == (TokenType)Identifier)
 	{
@@ -52,7 +52,7 @@ Block* parser::Statements()
 	{
 		match((TokenType)LeftBrace);
 		isThereLeftBrace = true;
-	} 
+	}
 	Block *b = new Block(isThereLeftBrace);
 	while (isStatement())
 	{
@@ -70,9 +70,17 @@ Block* parser::Statements()
 Statement * parser::statementf()
 {
 	Statement *temp = new Statement();
-	if (_token.TokenType == (TokenType)Int || _token.TokenType == (TokenType)Char || _token.TokenType == (TokenType)String|| _token.TokenType == (TokenType)Float || _token.TokenType == (TokenType)Bool || _token.TokenType == (TokenType)Array)
+	if (_token.TokenType == (TokenType)Int ||
+		_token.TokenType == (TokenType)Char ||
+		_token.TokenType == (TokenType)String ||
+		_token.TokenType == (TokenType)Float ||
+		_token.TokenType == (TokenType)Bool)
 	{
 		temp = declaration();
+	}
+	else if (_token.TokenType == (TokenType)Array)
+	{
+		temp = arrDeclaration();
 	}
 	else if (_token.TokenType == (TokenType)Semicolon)
 	{
@@ -106,10 +114,31 @@ Assignment* parser::assignment()
 {
 	Variable* var = new Variable(_token);
 	match((TokenType)Identifier);
+	while (_token.TokenType == (TokenType)LeftBracket)
+	{
+		match((TokenType)LeftBracket);
+		if (_token.TokenType == IntLiteral)
+		{
+			int num = stoi(_token.TokenValue);
+			if (num < 0) assert(false && "Should Be Greater Than '0'");
+			var->arrNum.push_back(num);
+			match((TokenType)IntLiteral);
+		}
+		else
+		{
+			assert(false && "Should be Int literal In Brackey");
+		}
+		match((TokenType)RightBracket);
+	}
 	match((TokenType)Assign);
 	Expression* source = expression();
 	match((TokenType)Semicolon);
 	return new Assignment(var, source);
+}
+
+Assignment * parser::arrAssignmnet()
+{
+	return nullptr;
 }
 
 Statement* parser::Skip()
@@ -142,7 +171,7 @@ Conditional* parser::Ifstatement()
 		}
 		return new Conditional(ex, state, statementf());
 	}
-	if(isThereElseIf)
+	if (isThereElseIf)
 		return new Conditional(ex, state, vc);
 	return new Conditional(ex, state);
 }
@@ -168,20 +197,14 @@ Loop* parser::WhileStatement()
 
 Block* parser::declaration()
 {
-	bool isItArray = false;
-	int arrnum = 0;
-	if (_token.TokenType == (TokenType)Array)
-	{
-		isItArray = true;
-		arrnum = getArrayDemension(_token.TokenValue);
-		match(_token.TokenType);
-	}
-	
 	Block* b = new Block(false);
 	Block* b2 = new Block(false);
 	Declaration* d = new Declaration();
 	Assignment* a = new Assignment();
-	if (_token.TokenType == (TokenType)Int || _token.TokenType == (TokenType)Char || _token.TokenType == (TokenType)Float || _token.TokenType == (TokenType)String)
+	if (_token.TokenType == (TokenType)Int ||
+		_token.TokenType == (TokenType)Char ||
+		_token.TokenType == (TokenType)Float ||
+		_token.TokenType == (TokenType)String)
 	{
 		d->valueType = match(_token.TokenType);
 	}
@@ -190,8 +213,6 @@ Block* parser::declaration()
 	{
 		d->valueName.push_back(_token.TokenName);
 		Variable* vartemp = new Variable(_token);
-		if (isItArray)
-			vartemp = new Variable(_token, arrnum);
 		match(_token.TokenType);
 
 		// 선언 및 정의 ~
@@ -200,12 +221,12 @@ Block* parser::declaration()
 			match(_token.TokenType);
 			if (_token.TokenType == (TokenType)IntLiteral ||
 				_token.TokenType == (TokenType)FloatLiteral ||
-				_token.TokenType == (TokenType)CharLiteral||
+				_token.TokenType == (TokenType)CharLiteral ||
 				_token.TokenType == (TokenType)StringLiteral)
 			{
 				Value* valtemp = new Value(_token);
 				match(_token.TokenType);
-				a = new Assignment(vartemp,valtemp);
+				a = new Assignment(vartemp, valtemp);
 				b2->members.push_back(a);
 			}
 		}
@@ -220,8 +241,6 @@ Block* parser::declaration()
 			{
 				d->valueName.push_back(_token.TokenName);
 				Variable* vartemp = new Variable(_token);
-				if (isItArray)
-					vartemp = new Variable(_token, arrnum);
 				match(_token.TokenType);
 				// 선언 및 정의 ~
 				if (_token.TokenType == (TokenType)Assign)
@@ -229,7 +248,7 @@ Block* parser::declaration()
 					match(_token.TokenType);
 					if (_token.TokenType == (TokenType)IntLiteral ||
 						_token.TokenType == (TokenType)FloatLiteral ||
-						_token.TokenType == (TokenType)CharLiteral||
+						_token.TokenType == (TokenType)CharLiteral ||
 						_token.TokenType == (TokenType)StringLiteral)
 					{
 						Value* valtemp = new Value(_token);
@@ -253,6 +272,93 @@ Block* parser::declaration()
 	b->members.push_back(d);
 	b->members.push_back(b2);
 	return b;
+}
+
+Block * parser::arrDeclaration()
+{
+	int arrnum = getArrayDemension(_token.TokenValue);
+	match(_token.TokenType);
+
+	Block* b = new Block(false);
+	Block* b2 = new Block(false);
+	Declaration* d = new Declaration(arrnum);
+	Assignment* a = new Assignment();
+	if (_token.TokenType == (TokenType)Int ||
+		_token.TokenType == (TokenType)Char ||
+		_token.TokenType == (TokenType)Float ||
+		_token.TokenType == (TokenType)String)
+	{
+		d->valueType = match(_token.TokenType);
+	}
+	else
+	{
+		assert(false && "Array Declaration Error");
+	}
+	// 선언 ~
+	if (_token.TokenType == (TokenType)Identifier)
+	{
+		d->valueName.push_back(_token.TokenName);
+		Variable* vartemp = new Variable(_token, arrnum);
+		match(_token.TokenType);
+
+		// 선언 및 정의 ~
+		//if (_token.TokenType == (TokenType)Assign)
+		//{
+		//	match(_token.TokenType);
+		//	if (_token.TokenType == (TokenType)IntLiteral ||
+		//		_token.TokenType == (TokenType)FloatLiteral ||
+		//		_token.TokenType == (TokenType)CharLiteral ||
+		//		_token.TokenType == (TokenType)StringLiteral)
+		//	{
+		//		Value* valtemp = new Value(_token);
+		//		match(_token.TokenType);
+		//		a = new Assignment(vartemp, valtemp);
+		//		b2->members.push_back(a);
+		//	}
+		//}
+		// ~ 선언 및 정의
+
+		// 다중선언 ~
+		while (_token.TokenType == (TokenType)Comma)
+		{
+			match(_token.TokenType);
+			// 선언 ~
+			if (_token.TokenType == (TokenType)Identifier)
+			{
+				d->valueName.push_back(_token.TokenName);
+				Variable* vartemp = new Variable(_token, arrnum);
+				match(_token.TokenType);
+				// 선언 및 정의 ~
+				//if (_token.TokenType == (TokenType)Assign)
+				//{
+				//	match(_token.TokenType);
+				//	if (_token.TokenType == (TokenType)IntLiteral ||
+				//		_token.TokenType == (TokenType)FloatLiteral ||
+				//		_token.TokenType == (TokenType)CharLiteral ||
+				//		_token.TokenType == (TokenType)StringLiteral)
+				//	{
+				//		Value* valtemp = new Value(_token);
+				//		match(_token.TokenType);
+				//		a = new Assignment(vartemp, valtemp);
+				//		b2->members.push_back(a);
+				//	}
+				//}
+				// ~ 선언 및 정의
+			}
+			// ~ 선언
+		}
+		// ~ 다중선언
+		match((TokenType)Semicolon);
+	}
+	// ~ 선언
+	else
+	{
+		assert(false && "Declaration Error");
+	}
+	b->members.push_back(d);
+	b->members.push_back(b2);
+	return b;
+	return nullptr;
 }
 
 Expression * parser::expression()
@@ -350,8 +456,24 @@ Expression* parser::primary()
 	{
 		e = new Variable(_token);
 		match(_token.TokenType);
+		while (_token.TokenType == (TokenType)LeftBracket)
+		{
+			match((TokenType)LeftBracket);
+			if (_token.TokenType == IntLiteral)
+			{
+				if (stoi(_token.TokenValue) < 0) assert(false && "Should be Greater Than 0 in Brackety");
+				((Variable*)e)->arrNum.push_back(stoi(_token.TokenValue));
+				match((TokenType)IntLiteral);
+			}
+			else
+			{
+				assert(false && "Should be IntLiteral in Bracket");
+			}
+			match((TokenType)RightBracket);
+		}
+		//((Variable*)e)->arrDemension = arrnum;
 	}
-	else if (_token.TokenType == IntLiteral || _token.TokenType == CharLiteral|| _token.TokenType == (TokenType)StringLiteral || _token.TokenType == FloatLiteral || _token.TokenType == True || _token.TokenType == False)
+	else if (_token.TokenType == IntLiteral || _token.TokenType == CharLiteral || _token.TokenType == (TokenType)StringLiteral || _token.TokenType == FloatLiteral || _token.TokenType == True || _token.TokenType == False)
 	{
 		e = new Value(_token);
 		match(_token.TokenType);
@@ -362,7 +484,7 @@ Expression* parser::primary()
 		e = expression();
 		match(RightParen);
 	}
-	else if (_token.TokenType == Int || _token.TokenType == Char || _token.TokenType == Float || _token.TokenType == (TokenType)String|| _token.TokenType == Bool)
+	else if (_token.TokenType == Int || _token.TokenType == Char || _token.TokenType == Float || _token.TokenType == (TokenType)String || _token.TokenType == Bool)
 	{
 		string val = _token.TokenValue;
 		Operator* op = new Operator(val);
@@ -383,17 +505,17 @@ Expression* parser::primary()
 
 int parser::getArrayDemension(string str)
 {
-	int arrDemension = 0;
+	string temp = "";
 	for (int i = 0; i < str.size(); i++)
 	{
 		if ('0' <= str[i] && str[i] <= '9')
 		{
-			arrDemension = i + 1;
+			temp = temp + str[i];
 		}
 		else
 			break;
 	}
-	return arrDemension;
+	return stoi(temp);
 }
 
 TokenType parser::match(TokenType tokenType)
@@ -407,6 +529,7 @@ TokenType parser::match(TokenType tokenType)
 		return tokenType;
 	}
 	cout << _nowTokenNum << endl;
+	cout << _token.TokenType << endl;
 	cout << _token.TokenName << endl;
 	assert(false && "TokenType Mismatch!!");
 }

@@ -4,6 +4,9 @@
 #include "AST.h"
 #include "TypeCheckr.h"
 #include "CodeGenerator.h"
+
+#include <Windows.h>
+#include <sstream>
 //#include "generatedCode.h"
 using namespace std;
 

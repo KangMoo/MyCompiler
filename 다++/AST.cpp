@@ -88,7 +88,12 @@ void AST::displayExpression(Expression * e)
 void AST::displayAssignment(Assignment * a, int tab)
 {
 	tabSet(tab); cout << "<Assignment>" << endl;;
-	tabSet(tab + 1); cout << "Target :" << a->target->id << endl;
+	tabSet(tab + 1); cout << "Target :" << a->target->id;
+	for (auto i : a->target->arrNum)
+	{
+		cout << "[" << i << "]";
+	}
+	cout << endl;
 	tabSet(tab + 1); cout << "Source :";
 	displayExpression(a->source);
 	cout << endl;
@@ -156,6 +161,10 @@ void AST::displayDeclaration(Declaration* d, int tab)
 		cout << "Bool";
 		break;
 	}
+	if (d->arrDemension > 0)
+	{
+		cout << " (Array Demension : " << d->arrDemension<<")";
+	}
 	cout << endl;
 
 	for (auto i : d->valueName)
@@ -166,7 +175,14 @@ void AST::displayDeclaration(Declaration* d, int tab)
 
 void AST::displayVariable(Variable * v)
 {
-	cout << "(Var:" << v->id << ")";
+
+	cout << "(Var:" << v->id;
+	for (auto i : v->arrNum)
+	{
+		cout << "[" << i << "]";
+	}
+	cout << ")";
+
 }
 
 void AST::displayValue(Value * v)
