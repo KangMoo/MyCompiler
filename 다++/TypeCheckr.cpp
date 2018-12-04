@@ -80,16 +80,16 @@ void TypeCheckr::typeCheck(Statement * s, const int tsp)
 	}
 	else if (s->StatementName == "Command_ArrPushBack")
 	{
-		assert(isArrDemensionOne(((Command_ArrPushBack*)s)->var) && "Demension Error (Should be 'One' Demension)");
-		for (auto i : ((Command_ArrPushBack*)s)->expressions)
-		{
-			if (i->StatementName == "Variable")
-				assert(isArrDemensionZero((Variable*)i) && "Demension Error (Should be 'Zero' Demension)");
-		}
+		//assert(isArrDemensionOne(((Command_ArrPushBack*)s)->var) && "Demension Error");
+		//for (auto i : ((Command_ArrPushBack*)s)->expressions)
+		//{
+		//	if (i->StatementName == "Variable")
+		//		assert(isArrDemensionZero((Variable*)i) && "Demension Error (Should be 'Zero' Demension)");
+		//}
 	}
 	else if (s->StatementName == "Command_ArrErase")
 	{
-		assert(isArrDemensionOne(((Command_ArrErase*)s)->var) && "Demension Error (Should be 'One' Demension)");
+		//assert(isArrDemensionOne(((Command_ArrErase*)s)->var) && "Demension Error");
 	}
 }
 

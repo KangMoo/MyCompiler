@@ -223,7 +223,11 @@ string CodeGenerator::generateBlock(Block * b, int tab, bool mainBlock)
 	}
 	if (b->isThereBrace)
 	{
-		if (mainBlock) str += tabSet(tab) + "return 0;\n";
+		if (mainBlock)
+		{
+			str += tabSet(tab) + "system(\"pause\");\n";
+			str += tabSet(tab) + "return 0;\n";
+		}
 		str += tabSet(--tab) + "}\n";
 	}
 	return str;
@@ -288,6 +292,12 @@ string CodeGenerator::generateCommandArrE(Command_ArrErase * c, int tab)
 
 	str += tabSet(tab);
 	str += c->var->id;
+	for (auto i : c->var->arrNum)
+	{
+		str += "[";
+		str += to_string(i);
+		str += "]";
+	}
 	str += ".erase(";
 	str += c->var->id;
 	for (auto i : c->var->arrNum)
@@ -410,6 +420,7 @@ string CodeGenerator::mkCodeStart(bool mkcpp)
 	else
 	{
 		str += "#include <iostream>\n";
+		str += "#include <vector>\n";
 		str += "using namespace std;\n";
 		str += "int main()\n";
 	}
