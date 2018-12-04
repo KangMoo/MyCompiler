@@ -25,6 +25,10 @@ private:
 	Loop* WhileStatement();
 	Block* declaration();
 	Block* arrDeclaration();
+	Command_Input* command_input();
+	Command_Output* command_output();
+	Command_ArrPushBack* command_arrpushback();
+	Command_ArrErase* command_arrpop();
 	//
 	Expression* expression();
 	Expression* conjunction();

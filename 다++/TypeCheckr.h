@@ -14,6 +14,8 @@ private:
 	//TokenType typeof(Expression* e);
 	bool isInTypeMap(Expression* e);
 	bool isInTypeMap(string str);
+	bool isArrDemensionZero(Variable* v);
+	bool isArrDemensionOne(Variable* v);
 	int getDemension(Expression* e);
 public:
 	//void typeCheck(Block* b, const int tsp);

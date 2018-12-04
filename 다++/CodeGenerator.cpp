@@ -48,6 +48,22 @@ string CodeGenerator::generateStatement(Statement * s, int tab)
 	{
 		str += generateDeclaration((Declaration*)s, tab);
 	}
+	else if (s->getStatementName() == "Command_Input")
+	{
+		str += generateCommandInput((Command_Input*)s, tab);
+	}
+	else if (s->getStatementName() == "Command_Output")
+	{
+		str += generateCommandOutput((Command_Output*)s, tab);
+	}
+	else if (s->getStatementName() == "Command_ArrPushBack")
+	{
+		str += generateCommandArrPB((Command_ArrPushBack*)s, tab);
+	}
+	else if (s->getStatementName() == "Command_ArrErase")
+	{
+		str += generateCommandArrE((Command_ArrErase*)s, tab);
+	}
 	return str;
 }
 
@@ -108,7 +124,7 @@ string CodeGenerator::generateConditional(Conditional * c, int tab)
 
 	for (auto i : c->elseIfBranch)
 	{
-		str += generateEIConditional(i,tab);
+		str += generateEIConditional(i, tab);
 	}
 
 	if (c->isThereElsebranch)
@@ -193,13 +209,13 @@ string CodeGenerator::generateDeclaration(Declaration * d, int tab)
 	return str;
 }
 
-string CodeGenerator::generateBlock(Block * b, int tab,bool mainBlock)
+string CodeGenerator::generateBlock(Block * b, int tab, bool mainBlock)
 {
 	string str = "";
 	if (b->isThereBrace)
 	{
 		str += tabSet(tab++) + "{\n";
-	
+
 	}
 	for (int i = 0; i < b->members.size(); i++)
 	{
@@ -210,6 +226,89 @@ string CodeGenerator::generateBlock(Block * b, int tab,bool mainBlock)
 		if (mainBlock) str += tabSet(tab) + "return 0;\n";
 		str += tabSet(--tab) + "}\n";
 	}
+	return str;
+}
+
+string CodeGenerator::generateCommandInput(Command_Input * c, int tab)
+{
+	string str = "";
+	str += tabSet(tab) + "cin>>";
+	for (int i = 0; i < c->vars.size(); i++)
+	{
+		str += c->vars[i]->id;
+		for (auto i : c->vars[i]->arrNum)
+		{
+			str += "[";
+			str += to_string(i);
+			str += "]";
+		}
+		if (i != c->vars.size() - 1) str += ">>";
+	}
+	str += ";\n";
+	return str;
+}
+
+string CodeGenerator::generateCommandOutput(Command_Output * c, int tab)
+{
+	string str = "";
+	str += tabSet(tab) + "cout<<";
+	for (int i = 0; i < c->expressions.size(); i++)
+	{
+		str += generateExpression(c->expressions[i]);
+
+		if (i != c->expressions.size() - 1) str += "<<";
+		else str += "<<endl;\n";
+	}
+	return str;
+}
+
+string CodeGenerator::generateCommandArrPB(Command_ArrPushBack * c, int tab)
+{
+	string str = "";
+	for (auto i : c->expressions)
+	{
+		str += tabSet(tab);
+		str += c->var->id;
+		for (auto j : c->var->arrNum)
+		{
+			str += "[";
+			str += to_string(j);
+			str += "]";
+		}
+		str += ".push_back(";
+		str += generateExpression(i);
+		str += ");\n";
+	}
+	return str;
+}
+
+string CodeGenerator::generateCommandArrE(Command_ArrErase * c, int tab)
+{
+	string str = "";
+
+	str += tabSet(tab);
+	str += c->var->id;
+	str += ".erase(";
+	str += c->var->id;
+	for (auto i : c->var->arrNum)
+	{
+		str += "[";
+		str += to_string(i);
+		str += "]";
+	}
+	str += ".begin()+";
+	str += to_string(c->popStart);
+	str += ",";
+	str += c->var->id;
+	for (auto i : c->var->arrNum)
+	{
+		str += "[";
+		str += to_string(i);
+		str += "]";
+	}
+	str += ".begin()+";
+	str += to_string(c->popEnd);
+	str += ");\n";
 	return str;
 }
 
@@ -243,7 +342,7 @@ string CodeGenerator::generateValue(Value * v)
 	}
 	else if (v->type == StringLiteral)
 	{
-		str += "\"" +v->stringValue + "\"";
+		str += "\"" + v->stringValue + "\"";
 	}
 	else if (v->type == True)
 	{

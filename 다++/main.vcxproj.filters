@@ -30,14 +30,14 @@
     <ClCompile Include="AST.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="TypeCheckr.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="CodeGenerator.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="generatedCode.cpp">
       <Filter>IO</Filter>
+    </ClCompile>
+    <ClCompile Include="TypeCheckr.cpp">
+      <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -55,13 +55,41 @@ void TypeCheckr::typeCheck(Statement * s, const int tsp)
 		}
 		if (b->isThereBrace)
 		{
-			if(_typeMap.size() < nowTypeMapSP)
-			_typeMap.erase(_typeMap.begin() + nowTypeMapSP + 1, _typeMap.end());
+			if (_typeMap.size() < nowTypeMapSP)
+				_typeMap.erase(_typeMap.begin() + nowTypeMapSP + 1, _typeMap.end());
 		}
 	}
 	else if (s->StatementName == "Expression")
 	{
 		typeCheck(((Expression*)s));
+	}
+	else if (s->StatementName == "Command_Input")
+	{
+		for (auto i : ((Command_Input*)s)->vars)
+		{
+			assert(isArrDemensionZero(i) && "Demension Error (Should be 'Zero' Demension)");
+		}
+	}
+	else if (s->StatementName == "Command_Output")
+	{
+		for (auto i : ((Command_Output*)s)->expressions)
+		{
+			if (i->StatementName == "Variable")
+				assert(isArrDemensionZero((Variable*)i) && "Demension Error (Should be 'Zero' Demension)");
+		}
+	}
+	else if (s->StatementName == "Command_ArrPushBack")
+	{
+		assert(isArrDemensionOne(((Command_ArrPushBack*)s)->var) && "Demension Error (Should be 'One' Demension)");
+		for (auto i : ((Command_ArrPushBack*)s)->expressions)
+		{
+			if (i->StatementName == "Variable")
+				assert(isArrDemensionZero((Variable*)i) && "Demension Error (Should be 'Zero' Demension)");
+		}
+	}
+	else if (s->StatementName == "Command_ArrErase")
+	{
+		assert(isArrDemensionOne(((Command_ArrErase*)s)->var) && "Demension Error (Should be 'One' Demension)");
 	}
 }
 
@@ -117,6 +145,31 @@ bool TypeCheckr::isInTypeMap(string str)
 	return false;
 }
 
+bool TypeCheckr::isArrDemensionZero(Variable * v)
+{
+
+	for (auto i : _typeMap)
+	{
+		if (i.name == v->id)
+		{
+			if (i.arrDemension == v->arrNum.size()) return true;
+		}
+	}
+	return false;
+}
+
+bool TypeCheckr::isArrDemensionOne(Variable * v)
+{
+	for (auto i : _typeMap)
+	{
+		if (i.name == v->id)
+		{
+			if (i.arrDemension - v->arrNum.size() == 1) return true;
+		}
+	}
+	return false;
+}
+
 int TypeCheckr::getDemension(Expression * e)
 {
 	int demension = 0;
@@ -138,7 +191,7 @@ int TypeCheckr::getDemension(Expression * e)
 				tempdemension = i.arrDemension;
 		}
 
-		demension = tempdemension- ((Variable*)e)->arrNum.size();
+		demension = tempdemension - ((Variable*)e)->arrNum.size();
 	}
 	else if (e->StatementName == "Binary")
 	{

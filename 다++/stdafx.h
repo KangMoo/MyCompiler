@@ -8,6 +8,7 @@
 #include <vector>
 #include <fstream>
 #include <algorithm>
+#include <typeinfo>
 
 using namespace std;
 
@@ -201,6 +202,43 @@ public:
 		StatementName = "Declaration"; arrDemension = d;
 	};
 };
+class Command_Input : public Statement {
+public:
+	TokenType valueType;
+	vector<Variable*> vars;
+	Command_Input() {
+		StatementName = "Command_Input";
+	};
+};
+class Command_Output : public Statement {
+public:
+	TokenType valueType;
+	vector<Expression*> expressions;
+	Command_Output() {
+		StatementName = "Command_Output";
+	};
+};
+
+class Command_ArrPushBack : public Statement {
+public:
+	TokenType valueType;
+	Variable* var;
+	vector<Expression*> expressions;
+	Command_ArrPushBack() {
+		StatementName = "Command_ArrPushBack";
+	};
+};
+class Command_ArrErase : public Statement {
+public:
+	TokenType valueType;
+	Variable* var;
+	int popStart;
+	int popEnd;
+	Command_ArrErase() {
+		StatementName = "Command_ArrErase";
+	};
+};
+
 class arrInformation {
 	int arrDemension;
 	vector<int> arrMaxSize;

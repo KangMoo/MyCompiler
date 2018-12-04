@@ -58,6 +58,22 @@ void AST::displayStatement(Statement * s, int tab)
 	{
 		displayDeclaration((Declaration*)s, tab);
 	}
+	else if (s->getStatementName() == "Command_Input")
+	{
+		displayICommand((Command_Input*)s, tab);
+	}
+	else if (s->getStatementName() == "Command_Output")
+	{
+		displayOCommand((Command_Output*)s, tab);
+	}
+	else if (s->getStatementName() == "Command_ArrPushBack")
+	{
+		displayArrPBCommand((Command_ArrPushBack*)s, tab);
+	}
+	else if (s->getStatementName() == "Command_ArrErase")
+	{
+		displayArrPCommand((Command_ArrErase*)s, tab);
+	}
 }
 
 void AST::displayExpression(Expression * e)
@@ -171,6 +187,54 @@ void AST::displayDeclaration(Declaration* d, int tab)
 	{
 		tabSet(tab + 1); cout << "Name : " << i << endl;
 	}
+	
+}
+
+void AST::displayICommand(Command_Input * c, int tab)
+{
+	tabSet(tab); cout << "<Command>" << endl;
+
+	tabSet(tab + 1); cout << "Input : ";
+	for (auto i : c->vars)
+	{
+		cout << i->id;
+		for (auto j : i->arrNum)
+		{
+			cout << "["<<j<< "]";
+		}
+		cout << " ";
+	}
+	cout << endl;
+}
+void AST::displayOCommand(Command_Output * c, int tab)
+{
+	tabSet(tab); cout << "<Command>" << endl;
+
+	tabSet(tab + 1); cout << "Output : ";
+	for (auto i : c->expressions)
+	{
+		displayExpression(i);
+		cout << " ";
+	}
+	cout << endl;
+}
+void AST::displayArrPBCommand(Command_ArrPushBack * c, int tab)
+{
+	tabSet(tab); cout << "<Array Push_Back>" << endl;
+	tabSet(tab + 1); cout << "Target : "; displayExpression(c->var); cout << endl;
+	for (auto i : c->expressions)
+	{
+		tabSet(tab + 1); cout << "Source : "; displayExpression(i); cout << endl;
+	}
+	cout << endl;
+}
+void AST::displayArrPCommand(Command_ArrErase * c, int tab)
+{
+
+	tabSet(tab); cout << "<Array Erase>" << endl;
+	tabSet(tab + 1); cout << "Target : "; displayExpression(c->var); cout << endl;
+	tabSet(tab + 1); cout << "Erase : "; cout << c->popStart << " ~ " << c->popEnd << endl;
+	cout << endl;
 }
 
 void AST::displayVariable(Variable * v)

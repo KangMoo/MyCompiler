@@ -49,7 +49,7 @@ void lexer::tokenize(string str, vector<Token> &vtoken)
 	{
 		tokstr.push_back(str);
 	}
-	else 
+	else
 	{
 		for (int i = 0; i < tkp.size(); i++)
 		{
@@ -91,7 +91,7 @@ void lexer::tokenize(string str, vector<Token> &vtoken)
 			j = i;
 		};
 	}
-	
+
 	//연결찾기
 	for (int i = 0; i < tokstr.size(); i++)
 	{
@@ -395,6 +395,30 @@ void lexer::tokenize(string str, vector<Token> &vtoken)
 			temptoken.TokenName = tokstr[i];
 			temptoken.TokenValue = tokstr[i];
 		}
+		else if (tokstr[i] == "입력")
+		{
+			temptoken.TokenType = (TokenType)CommandInput;
+			temptoken.TokenName = tokstr[i];
+			temptoken.TokenValue = tokstr[i];
+		}
+		else if (tokstr[i] == "출력")
+		{
+			temptoken.TokenType = (TokenType)CommandOutput;
+			temptoken.TokenName = tokstr[i];
+			temptoken.TokenValue = tokstr[i];
+		}
+		else if (tokstr[i] == "넣기")
+		{
+			temptoken.TokenType = (TokenType)CommandArrPushBack;
+			temptoken.TokenName = tokstr[i];
+			temptoken.TokenValue = tokstr[i];
+		}
+		else if (tokstr[i] == "뽑기")
+		{
+			temptoken.TokenType = (TokenType)CommandArrPop;
+			temptoken.TokenName = tokstr[i];
+			temptoken.TokenValue = tokstr[i];
+		}
 		else
 		{
 			if (isDigit(tokstr[i]))
@@ -482,7 +506,7 @@ void lexer::tokenCheck(vector<Token>& vtoken)
 			}
 		}
 	}
-	
+
 
 	//배열 인자 체크
 	//for (int i = 0; i < vtoken.size(); i++)

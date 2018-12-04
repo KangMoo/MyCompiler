@@ -17,7 +17,10 @@ private:
 	string generateLoop(Loop* l, int tab);
 	string generateDeclaration(Declaration* d, int tab);
 	string generateBlock(Block* b, int tab,bool mainBlock = false);
-
+	string generateCommandInput(Command_Input* c, int tab);
+	string generateCommandOutput(Command_Output* c, int tab);
+	string generateCommandArrPB(Command_ArrPushBack* c, int tab);
+	string generateCommandArrE(Command_ArrErase* c, int tab);
 	//Expression Code Generate
 	string generateVariable(Variable* v);
 	string generateValue(Value* v);
