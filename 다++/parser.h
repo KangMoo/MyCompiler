@@ -47,7 +47,7 @@ public:
 	void setTokenVector(vector<Token> vtoken);
 	bool isStatement();
 	Block* getBlock();
-	TokenType match(TokenType tokenType);
+	TokenType match(TokenType tokenType, string mes = "");
 	parser();
 	~parser();
 };

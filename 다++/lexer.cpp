@@ -129,7 +129,8 @@ void lexer::tokenize(string str, vector<Token> &vtoken)
 	//빈칸 지우기
 	for (int i = 0; i < tokstr.size(); i++)
 	{
-		if (tokstr[i] == " " || tokstr[i] == "\r" || tokstr[i] == "\t" || tokstr[i] == "")
+		bool InQ = false;
+		if (tokstr[i] == "\r" || tokstr[i] == "\t" || tokstr[i] == "")
 		{
 			tokstr.erase(tokstr.begin() + i);
 		}
@@ -419,6 +420,12 @@ void lexer::tokenize(string str, vector<Token> &vtoken)
 			temptoken.TokenName = tokstr[i];
 			temptoken.TokenValue = tokstr[i];
 		}
+		else if (tokstr[i] == " ")
+		{
+			temptoken.TokenType = (TokenType)Blank;
+			temptoken.TokenName = tokstr[i];
+			temptoken.TokenValue = tokstr[i];
+		}
 		else
 		{
 			if (isDigit(tokstr[i]))
@@ -479,19 +486,31 @@ void lexer::tokenCheck(vector<Token>& vtoken)
 	}
 
 	//문자열
+	bool isInDQ = false;
 	for (int i = 0; i < vtoken.size(); i++)
 	{
 		if (i >= vtoken.size() - 3) break;
 		if (vtoken[i].TokenType == DoubleQuotation)
 		{
-			assert((vtoken[i + 2].TokenType == DoubleQuotation) && "DoubleQuotation 오류");
 			Token temp;
 			temp.TokenType = (TokenType)StringLiteral;
-			temp.TokenName = vtoken[i + 1].TokenName;
-			temp.TokenValue = vtoken[i + 1].TokenName;
-			vtoken[i] = temp;
-			vtoken.erase(vtoken.begin() + i + 1, vtoken.begin() + i + 3);
-			i = 0;
+			temp.TokenName = "";
+			temp.TokenValue = "";
+			for (int j = i + 1; j < vtoken.size(); j++)
+			{
+				if (vtoken[j].TokenType != DoubleQuotation)
+				{
+					temp.TokenName += vtoken[j].TokenName;
+					temp.TokenValue += vtoken[j].TokenName;
+				}
+				else
+				{
+					vtoken[i] = temp;
+					vtoken.erase(vtoken.begin() + i+1, vtoken.begin() + j+1);
+					i = j + 1;
+					break;
+				}
+			}
 		}
 	}
 
@@ -507,6 +526,14 @@ void lexer::tokenCheck(vector<Token>& vtoken)
 		}
 	}
 
+	for (int i = 0; i < vtoken.size(); i++)
+	{
+		if (vtoken[i].TokenType == (TokenType)Blank)
+		{
+			vtoken.erase(vtoken.begin() + i);
+			i = 0;
+		}
+	}
 
 	//배열 인자 체크
 	//for (int i = 0; i < vtoken.size(); i++)

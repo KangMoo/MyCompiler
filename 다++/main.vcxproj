@@ -122,7 +122,6 @@
     <ClCompile Include="AST.cpp" />
     <ClCompile Include="CodeGenerator.cpp" />
     <ClCompile Include="Compiler.cpp" />
-    <ClCompile Include="generatedCode.cpp" />
     <ClCompile Include="lexer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="parser.cpp" />
@@ -132,7 +131,6 @@
     <ClInclude Include="AST.h" />
     <ClInclude Include="CodeGenerator.h" />
     <ClInclude Include="Compiler.h" />
-    <ClInclude Include="generatedCode.h" />
     <ClInclude Include="lexer.h" />
     <ClInclude Include="parser.h" />
     <ClInclude Include="stdafx.h" />
@@ -140,7 +138,6 @@
     <ClInclude Include="TypeCheckr.h" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="generatedCode.txt" />
     <Text Include="test.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
