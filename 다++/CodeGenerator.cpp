@@ -421,6 +421,7 @@ string CodeGenerator::mkCodeStart(bool mkcpp)
 	{
 		str += "#include <iostream>\n";
 		str += "#include <vector>\n";
+		str += "#include <string>\n";
 		str += "using namespace std;\n";
 		str += "int main()\n";
 	}

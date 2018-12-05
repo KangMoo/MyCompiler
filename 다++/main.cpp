@@ -78,7 +78,7 @@ int main()
 							_export_filename[++i] = 'e';
 							_export_filename[++i] = 'x';
 							_export_filename[++i] = 'e';
-							_export_filename[++i] = '\n';
+							_export_filename[++i] = '\0';
 							break;
 						}
 					}
