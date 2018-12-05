@@ -82,10 +82,11 @@ int main()
 							break;
 						}
 					}
-					strcpy_s(command, "");
+					strcpy_s(command, "\"");
 					strcat_s(command, curDir);
 					strcat_s(command, "\\");
 					strcat_s(command, _export_filename);
+					strcat_s(command, "\"");
 
 					cout << endl << endl << endl;
 					cout << "**********************************************************************" << endl;
