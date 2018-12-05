@@ -20,7 +20,7 @@ bool parser::isStatement()
 	if (_token.TokenType == (TokenType)Int || _token.TokenType == (TokenType)Char || _token.TokenType == (TokenType)String || _token.TokenType == (TokenType)Bool || _token.TokenType == (TokenType)Float || _token.TokenType == (TokenType)Array ||
 		_token.TokenType == (TokenType)Semicolon || _token.TokenType == (TokenType)LeftBrace || _token.TokenType == (TokenType)If ||
 		_token.TokenType == (TokenType)While || _token.TokenType == (TokenType)Identifier ||
-		_token.TokenType == (TokenType)CommandInput || _token.TokenType == (TokenType)CommandOutput || _token.TokenType == (TokenType)CommandArrPushBack|| _token.TokenType == (TokenType)CommandArrPop)
+		_token.TokenType == (TokenType)CommandInput || _token.TokenType == (TokenType)CommandOutput || _token.TokenType == (TokenType)CommandArrPushBack || _token.TokenType == (TokenType)CommandArrPop)
 	{
 		return true;
 	}
@@ -51,7 +51,7 @@ Block* parser::Statements()
 	bool isThereLeftBrace = false;
 	if (_token.TokenType == (TokenType)LeftBrace)
 	{
-		match((TokenType)LeftBrace,"(Statements)");
+		match((TokenType)LeftBrace, "(Statements)");
 		isThereLeftBrace = true;
 	}
 	Block *b = new Block(isThereLeftBrace);
@@ -115,7 +115,7 @@ Statement * parser::statementf()
 	{
 		temp = command_arrpushback();
 	}
-	else if(_token.TokenType == (TokenType)CommandArrPop)
+	else if (_token.TokenType == (TokenType)CommandArrPop)
 	{
 		temp = command_arrpop();
 	}
@@ -134,11 +134,11 @@ Assignment* parser::assignment()
 	while (_token.TokenType == (TokenType)LeftBracket)
 	{
 		match((TokenType)LeftBracket, "(assignment)");
-		if (_token.TokenType == IntLiteral)
+		if (_token.TokenType == IntLiteral || _token.TokenType == Identifier)
 		{
 			int num = stoi(_token.TokenValue);
 			if (num < 0) assert(false && "Should Be Greater Than '0'");
-			var->arrNum.push_back(num);
+			var->arrNum.push_back(new Value(num));
 			match((TokenType)IntLiteral, "(assignment)");
 		}
 		else
@@ -178,7 +178,6 @@ Conditional* parser::Ifstatement()
 		vc.push_back(ElseIfstatement());
 		isThereElseIf = true;
 	}
-	int stop = 0;
 	if (_token.TokenType == (TokenType)Else)
 	{
 		match((TokenType)Else, "(Ifstatement)");
@@ -195,7 +194,7 @@ Conditional* parser::Ifstatement()
 
 Conditional * parser::ElseIfstatement()
 {
-	match((TokenType)ElseIf, "(ElseIfstatement)");
+	match(_token.TokenType, "(ElseIfstatement)");
 	match((TokenType)LeftParen, "(ElseIfstatement)");
 	Expression *ex = expression();
 	match((TokenType)RightParen, "(ElseIfstatement)");
@@ -365,7 +364,7 @@ Block * parser::arrDeclaration()
 			// ~ 識情
 		}
 		// ~ 陥掻識情
-		match((TokenType)Semicolon,"(arrDeclaration)");
+		match((TokenType)Semicolon, "(arrDeclaration)");
 	}
 	// ~ 識情
 	else
@@ -383,27 +382,27 @@ Command_Input * parser::command_input()
 	c->valueType = _token.TokenType;
 	match(_token.TokenType);
 	Variable* v = new Variable(_token);
-	match((TokenType)Identifier,"(command_input)");
-	
+	match((TokenType)Identifier, "(command_input)");
+
 	while (_token.TokenType == (TokenType)LeftBracket)
 	{
-		match((TokenType)LeftBracket,"(command_input)");
-		assert(_token.TokenType == (TokenType)IntLiteral && "Should be IntLiteral Between Brackets");
-		v->arrNum.push_back(stoi(_token.TokenValue));
-		match((TokenType)IntLiteral,"(command_input)");
-		match((TokenType)RightBracket,"(command_input)");
+		match((TokenType)LeftBracket, "(command_input)");
+		assert((_token.TokenType == (TokenType)IntLiteral || _token.TokenType == Identifier)&& "Should be IntLiteral Between Brackets");
+		v->arrNum.push_back(new Value(stoi(_token.TokenValue)));
+		match((TokenType)IntLiteral, "(command_input)");
+		match((TokenType)RightBracket, "(command_input)");
 	}
 	c->vars.push_back(v);
 	while (_token.TokenType == (TokenType)Comma)
 	{
-		match((TokenType)Identifier,"(command_input)");
+		match((TokenType)Identifier, "(command_input)");
 		Variable* v = new Variable(_token);
 
 		while (_token.TokenType == (TokenType)LeftBracket)
 		{
 			match((TokenType)LeftBracket, "(command_input)");
-			assert(_token.TokenType == (TokenType)IntLiteral && "Should be IntLiteral Between Brackets");
-			v->arrNum.push_back(stoi(_token.TokenValue));
+			assert((_token.TokenType == (TokenType)IntLiteral || _token.TokenType == Identifier )&& "Should be IntLiteral Between Brackets");
+			v->arrNum.push_back(new Value(stoi(_token.TokenValue)));
 			match((TokenType)IntLiteral, "(command_input)");
 			match((TokenType)RightBracket, "(command_input)");
 		}
@@ -437,12 +436,12 @@ Command_ArrPushBack * parser::command_arrpushback()
 	match(_token.TokenType);
 	c->var = new Variable(_token);
 	match((TokenType)Identifier, "(command_arrpushback)");
-	
+
 	while (_token.TokenType == (TokenType)LeftBracket)
 	{
 		match((TokenType)LeftBracket, "(command_arrpushback)");
-		assert(_token.TokenType == (TokenType)IntLiteral && "Should be IntLiteral Between Brackets");
-		c->var->arrNum.push_back(stoi(_token.TokenValue));
+		assert((_token.TokenType == (TokenType)IntLiteral || _token.TokenType == Identifier )&& "Should be IntLiteral Between Brackets");
+		c->var->arrNum.push_back(new Value(stoi(_token.TokenValue)));
 		match((TokenType)IntLiteral, "(command_arrpushback)");
 		match((TokenType)RightBracket, "(command_arrpushback)");
 	}
@@ -473,8 +472,8 @@ Command_ArrErase * parser::command_arrpop()
 	while (_token.TokenType == (TokenType)LeftBracket)
 	{
 		match((TokenType)LeftBracket, "(command_arrpop)");
-		assert(_token.TokenType == (TokenType)IntLiteral && "Should be IntLiteral Between Brackets");
-		c->var->arrNum.push_back(stoi(_token.TokenValue));
+		assert((_token.TokenType == (TokenType)IntLiteral || _token.TokenType == (TokenType)Identifier ) && "Should be IntLiteral Between Brackets");
+		c->var->arrNum.push_back(new Value(stoi(_token.TokenValue)));
 		match((TokenType)IntLiteral, "(command_arrpop)");
 		match((TokenType)RightBracket, "(command_arrpop)");
 	}
@@ -590,8 +589,13 @@ Expression* parser::primary()
 			if (_token.TokenType == IntLiteral)
 			{
 				if (stoi(_token.TokenValue) < 0) assert(false && "Should be Greater Than 0 in Bracket");
-				((Variable*)e)->arrNum.push_back(stoi(_token.TokenValue));
+				((Variable*)e)->arrNum.push_back(new Value(stoi(_token.TokenValue)));
 				match((TokenType)IntLiteral, "(primary)");
+			}
+			else if (_token.TokenType == Identifier)
+			{
+				((Variable*)e)->arrNum.push_back(new Variable(_token));
+				match((TokenType)Identifier, "(primary)");
 			}
 			else
 			{
@@ -646,7 +650,7 @@ int parser::getArrayDemension(string str)
 	return stoi(temp);
 }
 
-TokenType parser::match(TokenType tokenType,string mes)
+TokenType parser::match(TokenType tokenType, string mes)
 {
 	if (_token.TokenType == tokenType)
 	{

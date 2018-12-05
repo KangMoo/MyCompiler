@@ -243,7 +243,14 @@ void AST::displayVariable(Variable * v)
 	cout << "(Var:" << v->id;
 	for (auto i : v->arrNum)
 	{
-		cout << "[" << i << "]";
+		if (i->getStatementName() == "Value")
+		{
+			cout << "[" << i << "]";
+		}
+		else if (i->getStatementName() == "Variable")
+		{
+			cout << "[(Var:" << ((Variable*)i)->id<< ")]";
+		}
 	}
 	cout << ")";
 

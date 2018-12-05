@@ -46,7 +46,7 @@ public:
 	bool boolValue;
 	char charValue;
 	int arrDemension;
-	vector<int> arrNum;
+	vector<Expression*> arrNum;
 	string stringValue;
 public:
 	Variable() {};
@@ -119,6 +119,31 @@ public:
 		{
 			boolValue = false;
 		}
+		StatementName = "Value";
+	}
+	Value(int t) {
+		intValue = t;
+		type = (TokenType)Int;
+		StatementName = "Value";
+	}
+	Value(char t) {
+		charValue = t;
+		type = (TokenType)Char;
+		StatementName = "Value";
+	}
+	Value(float t) {
+		floatValue = t;
+		type = (TokenType)Float;
+		StatementName = "Value";
+	}
+	Value(bool t) {
+		boolValue = t;
+		type = (TokenType)Bool;
+		StatementName = "Value";
+	}
+	Value(string t) {
+		stringValue = t;
+		type = (TokenType)String;
 		StatementName = "Value";
 	}
 };

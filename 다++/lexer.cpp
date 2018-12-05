@@ -129,7 +129,6 @@ void lexer::tokenize(string str, vector<Token> &vtoken)
 	//빈칸 지우기
 	for (int i = 0; i < tokstr.size(); i++)
 	{
-		bool InQ = false;
 		if (tokstr[i] == "\r" || tokstr[i] == "\t" || tokstr[i] == "")
 		{
 			tokstr.erase(tokstr.begin() + i);
@@ -137,21 +136,21 @@ void lexer::tokenize(string str, vector<Token> &vtoken)
 	}
 
 	//연결찾기
-	for (int i = 0; i < tokstr.size(); i++)
-	{
-		if (tokstr[i] == "아니면")
-		{
-			if (i != tokstr.size() - 1)
-			{
-				if (tokstr[i + 1] == "또는")
-				{
-					tokstr[i] = "아니면 또는";
-					tokstr.erase(tokstr.begin() + i + 1);
-					i = 0;
-				}
-			}
-		}
-	}
+	//for (int i = 0; i < tokstr.size(); i++)
+	//{
+	//	if (tokstr[i] == "아니면")
+	//	{
+	//		if (i != tokstr.size() - 1)
+	//		{
+	//			if (tokstr[i + 2] == "만약")
+	//			{
+	//				tokstr[i] = "아니면 만약";
+	//				tokstr.erase(tokstr.begin() + i + 1);
+	//				i = 0;
+	//			}
+	//		}
+	//	}
+	//}
 
 	//주석 지우기
 	for (int i = 0; i < tokstr.size(); i++)
@@ -204,7 +203,7 @@ void lexer::tokenize(string str, vector<Token> &vtoken)
 			temptoken.TokenName = tokstr[i];
 			temptoken.TokenValue = tokstr[i];
 		}
-		else if (tokstr[i] == "아니면 또는" || tokstr[i] == "else if")
+		else if (tokstr[i] == "아니면 만약" || tokstr[i] == "else if")
 		{
 			temptoken.TokenType = ElseIf;
 			temptoken.TokenName = tokstr[i];
@@ -420,7 +419,7 @@ void lexer::tokenize(string str, vector<Token> &vtoken)
 			temptoken.TokenName = tokstr[i];
 			temptoken.TokenValue = tokstr[i];
 		}
-		else if (tokstr[i] == " ")
+		else if (tokstr[i] == " " || tokstr[i] == "\r" || tokstr[i] == "\t" || tokstr[i] == "")
 		{
 			temptoken.TokenType = (TokenType)Blank;
 			temptoken.TokenName = tokstr[i];
@@ -486,31 +485,47 @@ void lexer::tokenCheck(vector<Token>& vtoken)
 	}
 
 	//문자열
-	bool isInDQ = false;
 	for (int i = 0; i < vtoken.size(); i++)
 	{
+		Token temp2;
 		if (i >= vtoken.size() - 3) break;
 		if (vtoken[i].TokenType == DoubleQuotation)
 		{
-			Token temp;
-			temp.TokenType = (TokenType)StringLiteral;
-			temp.TokenName = "";
-			temp.TokenValue = "";
+			temp2.TokenType = (TokenType)StringLiteral;
+			temp2.TokenName = "";
+			temp2.TokenValue = "";
 			for (int j = i + 1; j < vtoken.size(); j++)
 			{
 				if (vtoken[j].TokenType != DoubleQuotation)
 				{
-					temp.TokenName += vtoken[j].TokenName;
-					temp.TokenValue += vtoken[j].TokenName;
+					temp2.TokenName += vtoken[j].TokenName;
+					temp2.TokenValue += vtoken[j].TokenName;
 				}
 				else
 				{
-					vtoken[i] = temp;
+					vtoken[i] = temp2;
 					vtoken.erase(vtoken.begin() + i+1, vtoken.begin() + j+1);
-					i = j + 1;
 					break;
 				}
 			}
+		}
+	}
+
+	//else if체크
+	for (int i = 0; i < vtoken.size(); i++)
+	{
+		if (i >= vtoken.size() - 3) break;
+		if (vtoken[i].TokenType == (TokenType)Else && vtoken[i + 1].TokenType == (TokenType)Blank && vtoken[i + 2].TokenType == (TokenType)If)
+		{
+			
+			Token temp;
+			temp.TokenType = (TokenType)ElseIf;
+			temp.TokenName = "ElseIf";
+			temp.TokenValue = "ElseIf";
+			vtoken[i] = temp;
+			vtoken.erase(vtoken.begin() + i + 1);
+			vtoken.erase(vtoken.begin() + i + 1);
+			i = 0;
 		}
 	}
 

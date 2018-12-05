@@ -101,7 +101,14 @@ string CodeGenerator::generateAssignment(Assignment * a, int tab)
 	for (auto i : a->target->arrNum)
 	{
 		str += "[";
-		str += to_string(i);
+		if (i->StatementName == "Value")
+		{
+			str += to_string(((Value*)i)->intValue);
+		}
+		else if (i->StatementName == "Variable")
+		{
+			str += ((Variable*)i)->id;
+		}
 		str += "]";
 	}
 	str += "=";
@@ -156,9 +163,9 @@ string CodeGenerator::generateLoop(Loop * l, int tab)
 	string str = "";
 	str += tabSet(tab) + "while" + "(";
 	str += generateExpression(l->test) + ")\n";
-	str += tabSet(tab++) + "{\n";
-	generateStatement(l->body, tab);
-	str += tabSet(--tab) + "}\n";
+	//str += tabSet(tab++) + "{\n";
+	str += generateStatement(l->body, tab+1);
+	//str += tabSet(--tab) + "}\n";
 
 	return str;
 }
@@ -243,7 +250,14 @@ string CodeGenerator::generateCommandInput(Command_Input * c, int tab)
 		for (auto i : c->vars[i]->arrNum)
 		{
 			str += "[";
-			str += to_string(i);
+			if (i->StatementName == "Value")
+			{
+				str += to_string(((Value*)i)->intValue);
+			}
+			else if (i->StatementName == "Variable")
+			{
+				str += ((Variable*)i)->id;
+			}
 			str += "]";
 		}
 		if (i != c->vars.size() - 1) str += ">>";
@@ -276,7 +290,14 @@ string CodeGenerator::generateCommandArrPB(Command_ArrPushBack * c, int tab)
 		for (auto j : c->var->arrNum)
 		{
 			str += "[";
-			str += to_string(j);
+			if (i->StatementName == "Value")
+			{
+				str += to_string(((Value*)i)->intValue);
+			}
+			else if (i->StatementName == "Variable")
+			{
+				str += ((Variable*)i)->id;
+			}
 			str += "]";
 		}
 		str += ".push_back(";
@@ -295,7 +316,14 @@ string CodeGenerator::generateCommandArrE(Command_ArrErase * c, int tab)
 	for (auto i : c->var->arrNum)
 	{
 		str += "[";
-		str += to_string(i);
+		if (i->StatementName == "Value")
+		{
+			str += to_string(((Value*)i)->intValue);
+		}
+		else if (i->StatementName == "Variable")
+		{
+			str += ((Variable*)i)->id;
+		}
 		str += "]";
 	}
 	str += ".erase(";
@@ -303,7 +331,14 @@ string CodeGenerator::generateCommandArrE(Command_ArrErase * c, int tab)
 	for (auto i : c->var->arrNum)
 	{
 		str += "[";
-		str += to_string(i);
+		if (i->StatementName == "Value")
+		{
+			str += to_string(((Value*)i)->intValue);
+		}
+		else if (i->StatementName == "Variable")
+		{
+			str += ((Variable*)i)->id;
+		}
 		str += "]";
 	}
 	str += ".begin()+";
@@ -313,7 +348,14 @@ string CodeGenerator::generateCommandArrE(Command_ArrErase * c, int tab)
 	for (auto i : c->var->arrNum)
 	{
 		str += "[";
-		str += to_string(i);
+		if (i->StatementName == "Value")
+		{
+			str += to_string(((Value*)i)->intValue);
+		}
+		else if (i->StatementName == "Variable")
+		{
+			str += ((Variable*)i)->id;
+		}
 		str += "]";
 	}
 	str += ".begin()+";
@@ -329,7 +371,14 @@ string CodeGenerator::generateVariable(Variable * v)
 	for (auto i : v->arrNum)
 	{
 		str += "[";
-		str += to_string(i);
+		if (i->StatementName == "Value")
+		{
+			str += to_string(((Value*)i)->intValue);
+		}
+		else if (i->StatementName == "Variable")
+		{
+			str += ((Variable*)i)->id;
+		}
 		str += "]";
 	}
 	return str;
