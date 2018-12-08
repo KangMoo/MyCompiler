@@ -1,73 +1,95 @@
 #include "TypeCheckr.h"
 
-void TypeCheckr::typeCheck(Statement * s, const int tsp)
+vector<TypeMap> TypeCheckr::typeCheck(Statement * s, vector<TypeMap> upperTM)
 {
-	int nowTypeMapSP = tsp;
+	vector<TypeMap> _typeMap[2];
+	_typeMap[0] = upperTM;
+
 	if (s->StatementName == "Assignment")
 	{
 		Assignment* a = (Assignment*)s;
-		typeCheck(a->target);
-		typeCheck(a->source);
-		int temp1 = getDemension(a->target);
-		int temp2 = getDemension(a->source);
+		typeCheck(a->target, combine2TypeMap(_typeMap));
+		typeCheck(a->source, combine2TypeMap(_typeMap));
+		int temp1 = getDemension(a->target, _typeMap);
+		int temp2 = getDemension(a->source, _typeMap);
 		assert(temp1 == temp2 && "Assignment Error : Different Demension Calculation");
 	}
 	else if (s->StatementName == "Loop")
 	{
 		Loop* l = (Loop*)s;
-		typeCheck(l->test);
-		typeCheck(l->body, nowTypeMapSP);
+		typeCheck(l->test, _typeMap);
+		typeCheck(l->body, combine2TypeMap(_typeMap));
 	}
 	else if (s->StatementName == "Conditional")
 	{
 		Conditional* c = (Conditional*)s;
-		typeCheck(c->test);
-		typeCheck(c->thenBranch, nowTypeMapSP);
+		typeCheck(c->test, _typeMap);
+		typeCheck(c->thenBranch, combine2TypeMap(_typeMap));
 		if (c->isThereElsebranch)
 		{
-			typeCheck(c->elseBranch, nowTypeMapSP);
+			typeCheck(c->elseBranch, combine2TypeMap(_typeMap));
 		}
 	}
 	else if (s->StatementName == "Declaration")
 	{
 		Declaration* d = (Declaration*)s;
-		TokenType t = d->valueType;
 		for (auto j : d->valueName)
 		{
-			if (isInTypeMap(j))
+			if (isInTypeMap(j, _typeMap[1]))
 			{
 				assert(false && "TypeMap Error (Duplicate declaration)");
 			}
 			TypeMap ttemp;
-			ttemp.type = t;
+			ttemp.type = d->valueType;
 			ttemp.name = j;
 			ttemp.arrDemension = d->arrDemension;
-			_typeMap.push_back(ttemp);
-			nowTypeMapSP++;
+			_typeMap[1].push_back(ttemp);
 		}
 	}
 	else if (s->StatementName == "Block")
 	{
 		Block* b = (Block*)s;
-		for (auto i : b->members)
-		{
-			typeCheck(i, nowTypeMapSP);
-		}
+		vector<TypeMap> temp;
+
 		if (b->isThereBrace)
 		{
-			if (_typeMap.size() < nowTypeMapSP)
-				_typeMap.erase(_typeMap.begin() + nowTypeMapSP + 1, _typeMap.end());
+			//for (auto i : b->members)
+			//{
+			//	typeCheck(i, combine2TypeMap(_typeMap));
+			//}
+			for (auto i : b->members)
+			{
+				temp = typeCheck(i, combine2TypeMap(_typeMap));
+				for (auto j : temp)
+				{
+					_typeMap[1].push_back(j);
+				}
+			}
 		}
+		else
+		{
+			for (auto i : b->members)
+			{
+				temp = typeCheck(i, combine2TypeMap(_typeMap));
+				for (auto j : temp)
+				{
+					_typeMap[1].push_back(j);
+				}
+			}
+		}
+		//	if (_typeMap.size() < nowTypeMapSP)
+		//		_typeMap.erase(_typeMap.begin() + nowTypeMapSP + 1, _typeMap.end());
+		//}
 	}
 	else if (s->StatementName == "Expression")
 	{
-		typeCheck(((Expression*)s));
+		typeCheck(((Expression*)s),_typeMap);
 	}
 	else if (s->StatementName == "Command_Input")
 	{
 		for (auto i : ((Command_Input*)s)->vars)
 		{
-			assert(isArrDemensionZero(i) && "Demension Error (Should be 'Zero' Demension)");
+			assert(isArrDemensionZero(i, _typeMap) && "Demension Error (Should be 'Zero' Demension)");
 		}
 	}
 	else if (s->StatementName == "Command_Output")
@@ -75,7 +97,7 @@ void TypeCheckr::typeCheck(Statement * s, const int tsp)
 		for (auto i : ((Command_Output*)s)->expressions)
 		{
 			if (i->StatementName == "Variable")
-				assert(isArrDemensionZero((Variable*)i) && "Demension Error (Should be 'Zero' Demension)");
+				assert(isArrDemensionZero((Variable*)i, _typeMap) && "Demension Error (Should be 'Zero' Demension)");
 		}
 	}
 	else if (s->StatementName == "Command_ArrPushBack")
@@ -91,16 +113,24 @@ void TypeCheckr::typeCheck(Statement * s, const int tsp)
 	{
 		//assert(isArrDemensionOne(((Command_ArrErase*)s)->var) && "Demension Error");
 	}
+	return combine2TypeMap(_typeMap);
 }
 
-void TypeCheckr::typeCheck(Expression * e)
+vector<TypeMap> TypeCheckr::typeCheck(Statement * s)
+{
+	vector<TypeMap> temp;
+	temp = typeCheck(s, temp);
+	return temp;
+}
+
+void TypeCheckr::typeCheck(Expression * e, vector<TypeMap> tm[2])
 {
 	if (e->StatementName == "Value")
 	{
 	}
 	else if (e->StatementName == "Variable")
 	{
-		if (!isInTypeMap(((Variable*)e)->id))
+		if (!isInTypeMap(((Variable*)e)->id, tm))
 		{
 			assert(false && "TypeMap Error (Undefined Variable used)");
 		}
@@ -108,23 +138,29 @@ void TypeCheckr::typeCheck(Expression * e)
 	else if (e->StatementName == "Binary")
 	{
 		Binary* b = ((Binary*)e);
-		typeCheck(b->term1);
-		typeCheck(b->term2);
-		int temp1 = getDemension(b->term1);
-		int temp2 = getDemension(b->term2);
+		typeCheck(b->term1, tm);
+		typeCheck(b->term2, tm);
+		int temp1 = getDemension(b->term1, tm);
+		int temp2 = getDemension(b->term2, tm);
 		assert(temp1 == temp2 && "Binary Error : Different Demension Calculation");
 	}
 	else if (e->StatementName == "Unary")
 	{
 		Unary* u = ((Unary*)e);
-		typeCheck(u->term);
+		typeCheck(u->term, tm);
 	}
 	return;
 }
 
-bool TypeCheckr::isInTypeMap(Expression * e)
+bool TypeCheckr::isInTypeMap(Expression * e, vector<TypeMap> tm[2])
 {
-	for (auto i : _typeMap)
+	if (isInTypeMap(e, tm[0]) || isInTypeMap(e, tm[1]))
+		return true;
+	return false;
+}
+bool TypeCheckr::isInTypeMap(Expression * e, vector<TypeMap> tm)
+{
+	for (auto i : tm)
 	{
 		if (i.name == ((Variable*)e)->id)
 		{
@@ -133,9 +169,16 @@ bool TypeCheckr::isInTypeMap(Expression * e)
 	}
 	return false;
 }
-bool TypeCheckr::isInTypeMap(string str)
+bool TypeCheckr::isInTypeMap(string str, vector<TypeMap> tm[2])
 {
-	for (auto i : _typeMap)
+	if (isInTypeMap(str, tm[0]) || isInTypeMap(str, tm[1]))
+		return true;
+	return false;
+}
+
+bool TypeCheckr::isInTypeMap(string str, vector<TypeMap> tm)
+{
+	for (auto i : tm)
 	{
 		if (i.name == str)
 		{
@@ -145,10 +188,16 @@ bool TypeCheckr::isInTypeMap(string str)
 	return false;
 }
 
-bool TypeCheckr::isArrDemensionZero(Variable * v)
+bool TypeCheckr::isArrDemensionZero(Variable * v, vector<TypeMap> tm[2])
 {
+	if (isArrDemensionZero(v, tm[0]) || isArrDemensionZero(v, tm[1]))
+		return true;
+	return false;
+}
 
-	for (auto i : _typeMap)
+bool TypeCheckr::isArrDemensionZero(Variable * v, vector<TypeMap> tm)
+{
+	for (auto i : tm)
 	{
 		if (i.name == v->id)
 		{
@@ -158,9 +207,16 @@ bool TypeCheckr::isArrDemensionZero(Variable * v)
 	return false;
 }
 
-bool TypeCheckr::isArrDemensionOne(Variable * v)
+bool TypeCheckr::isArrDemensionOne(Variable * v, vector<TypeMap> tm[2])
 {
-	for (auto i : _typeMap)
+	if (isArrDemensionOne(v, tm[0]) || isArrDemensionOne(v, tm[1]))
+		return true;
+	return false;
+}
+
+bool TypeCheckr::isArrDemensionOne(Variable * v, vector<TypeMap> tm)
+{
+	for (auto i : tm)
 	{
 		if (i.name == v->id)
 		{
@@ -170,7 +226,13 @@ bool TypeCheckr::isArrDemensionOne(Variable * v)
 	return false;
 }
 
-int TypeCheckr::getDemension(Expression * e)
+int TypeCheckr::getDemension(Expression * e, vector<TypeMap> tm[2])
+{
+	return getDemension(e, combine2TypeMap(tm));
+}
+
+
+int TypeCheckr::getDemension(Expression * e, vector<TypeMap> tm)
 {
 	int demension = 0;
 
@@ -180,12 +242,12 @@ int TypeCheckr::getDemension(Expression * e)
 	}
 	else if (e->StatementName == "Variable")
 	{
-		if (!isInTypeMap(((Variable*)e)->id))
+		if (!isInTypeMap(((Variable*)e)->id,tm))
 		{
 			assert(false && "TypeMap Error (Undefined Variable used)");
 		}
 		int tempdemension = 0;
-		for (auto i : _typeMap)
+		for (auto i : tm)
 		{
 			if (i.name == ((Variable*)e)->id)
 				tempdemension = i.arrDemension;
@@ -196,18 +258,27 @@ int TypeCheckr::getDemension(Expression * e)
 	else if (e->StatementName == "Binary")
 	{
 		Binary* b = ((Binary*)e);
-		int temp1 = getDemension(b->term1);
-		int temp2 = getDemension(b->term2);
+		int temp1 = getDemension(b->term1, tm);
+		int temp2 = getDemension(b->term2, tm);
 		assert(temp1 == temp2 && "Binary Error : Different Demension Calculation");
 	}
 	else if (e->StatementName == "Unary")
 	{
 		Unary* u = ((Unary*)e);
-		demension = getDemension(u->term);
+		demension = getDemension(u->term, tm);
 	}
 	return demension;
 }
 
+vector<TypeMap> TypeCheckr::combine2TypeMap(vector<TypeMap> tm[2])
+{
+	vector<TypeMap> temp = tm[0];
+	for (auto i : tm[1])
+	{
+		temp.push_back(i);
+	}
+	return temp;
+}
 //void TypeCheckr::typeCheck(Block * b, const int tsp)
 //{
 //	int nowTypeMapSP = tsp;
@@ -244,7 +315,7 @@ void TypeCheckr::showTypeMap()
 
 TypeCheckr::TypeCheckr()
 {
-	_typeMap.clear();
+
 }
 
 

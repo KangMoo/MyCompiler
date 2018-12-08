@@ -25,7 +25,7 @@ void Compiler::run()
 
 	//타입체커
 	TypeCheckr* _tc = new TypeCheckr();
-	_tc->typeCheck((Statement*)_parser->getBlock(), 0);
+	_tc->typeCheck((Statement*)_parser->getBlock());
 	//_tc->showTypeMap();
 
 	cout << endl << endl;
