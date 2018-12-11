@@ -28,6 +28,12 @@ void Compiler::run()
 	_tc->typeCheck((Statement*)_parser->getBlock());
 	//_tc->showTypeMap();
 
+	//코드생성
+	CodeGenerator* _cg = new CodeGenerator();
+	_cg->setFileName(_export_filename);
+	_cg->setBodyBlock(_parser->getBlock());
+	_cg->mkCode();
+	string _code = _cg->mkCode();
 	cout << endl << endl;
 	cout << "**********************************************************************" << endl;
 	cout << "** 정상적으로 코드가 생성되었습니다." << endl;
@@ -35,11 +41,11 @@ void Compiler::run()
 	cout << "**********************************************************************" << endl;
 	cin.getline(_export_filename, 1024);
 	system("cls");
-	//코드생성
-	CodeGenerator* _cg = new CodeGenerator();
-	_cg->setFileName(_export_filename);
-	_cg->setBodyBlock(_parser->getBlock());
-	_cg->mkCode();
+	ofstream _file;
+	_file.open(_export_filename);
+	_file << _code;
+	_file.close();
+
 }
 
 Compiler::Compiler()

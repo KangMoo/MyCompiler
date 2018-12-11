@@ -3,7 +3,7 @@
 class CodeGenerator
 {
 private:
-	ofstream _file;
+	//ofstream _file;
 	string _fileName;
 	Block* _block;
 	string _string;
@@ -29,7 +29,7 @@ private:
 	string tabSet(int c);
 public:
 
-	void mkCode(bool mkcpp = false);
+	string mkCode(bool mkcpp = false);
 	string mkCodeStart(bool mkcpp = false);
 	void setBodyBlock(Block* block) { _block = block; };
 	void setFileName(string fileName) { _fileName = fileName; };

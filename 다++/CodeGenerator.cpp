@@ -435,26 +435,29 @@ string CodeGenerator::generateUnary(Unary * u)
 	return str;
 }
 
-void CodeGenerator::mkCode(bool mkcpp)
+string CodeGenerator::mkCode(bool mkcpp)
 {
-	if (mkcpp)
-	{
-		_file.open(_fileName);
-		int tab = 0;
-		_file << mkCodeStart(mkcpp);
-		string str = generateBlock(_block, 0, true);
-		_file << str;
-		_file.close();
-	}
-	else
-	{
-		_file.open(_fileName);
-		int tab = 0;
-		_file << mkCodeStart();
-		string str = generateBlock(_block, 0, true);
-		_file << str;
-		_file.close();
-	}
+	string str = mkCodeStart(mkcpp);
+	str += generateBlock(_block, 0, true);
+	return str;
+	//if (mkcpp)
+	//{
+	//	_file.open(_fileName);
+	//	int tab = 0;
+	//	_file << mkCodeStart(mkcpp);
+	//	string str = generateBlock(_block, 0, true);
+	//	_file << str;
+	//	_file.close();
+	//}
+	//else
+	//{
+	//	_file.open(_fileName);
+	//	int tab = 0;
+	//	_file << mkCodeStart();
+	//	string str = generateBlock(_block, 0, true);
+	//	_file << str;
+	//	_file.close();
+	//}
 }
 
 string CodeGenerator::mkCodeStart(bool mkcpp)

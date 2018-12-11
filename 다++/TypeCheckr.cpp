@@ -53,10 +53,6 @@ vector<TypeMap> TypeCheckr::typeCheck(Statement * s, vector<TypeMap> upperTM)
 
 		if (b->isThereBrace)
 		{
-			//for (auto i : b->members)
-			//{
-			//	typeCheck(i, combine2TypeMap(_typeMap));
-			//}
 			for (auto i : b->members)
 			{
 				temp = typeCheck(i, combine2TypeMap(_typeMap));
